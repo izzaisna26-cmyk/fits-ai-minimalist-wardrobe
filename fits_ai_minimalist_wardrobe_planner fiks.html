@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fits AI - Intelligent Wardrobe & Outfit Planner</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brandPrimary: '#18181B', /* Ultra Sleek Charcoal */
+                        brandSecondary: '#71717A', /* Muted Gray */
+                        brandAccent: '#D4AF37', /* Champagne Gold Accent */
+                        bgLight: '#FAFAFA',
+                        cardLight: '#FFFFFF',
+                        bgDark: '#09090B',
+                        cardDark: '#18181B',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-serif-luxury {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom Premium Glassmorphism */
+        .premium-glass {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .dark .premium-glass {
+            background: rgba(24, 24, 27, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(63, 63, 70, 0.4);
+        }
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-bgLight dark:bg-bgDark text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col transition-colors duration-500">
+
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="auth-container" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900">
+        <div class="bg-white/85 dark:bg-zinc-900/85 backdrop-blur-2xl p-8 sm:p-10 rounded-[32px] shadow-2xl border border-zinc-200/50 dark:border-zinc-800/50 max-w-md w-full relative overflow-hidden transition-all duration-300">
+            <!-- Decorative Minimalist Elements -->
+            <div class="absolute -top-16 -right-16 w-40 h-40 bg-zinc-200/30 dark:bg-zinc-800/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-zinc-200/30 dark:bg-zinc-800/20 rounded-full blur-3xl"></div>
+
+            <div class="relative z-10 space-y-8">
+                <!-- Branding Header -->
+                <div class="text-center space-y-2">
+                    <h1 class="font-serif-luxury italic text-4xl tracking-tight text-zinc-900 dark:text-white">Fits.ai</h1>
+                    <p class="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-bold">Personal Closet & AI Stylist</p>
+                </div>
+
+                <div class="space-y-1 text-center">
+                    <h2 id="auth-title" class="font-serif-luxury text-xl font-bold text-zinc-800 dark:text-zinc-200">Welcome back</h2>
+                    <p id="auth-subtitle" class="text-xs text-zinc-400 dark:text-zinc-500">Masuk untuk mengakses lemari pakaian digital Anda.</p>
+                </div>
+
+                <!-- Form -->
+                <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Nama Pengguna</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-zinc-400">
+                                <i class="fa-regular fa-user text-xs"></i>
+                            </span>
+                            <input type="text" id="auth-username" required class="w-full pl-9 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:text-white text-sm transition" placeholder="contoh: fatimah / bayu">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Kata Sandi</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-zinc-400">
+                                <i class="fa-solid fa-lock text-xs"></i>
+                            </span>
+                            <input type="password" id="auth-password" required class="w-full pl-9 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:text-white text-sm transition" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="auth-submit-btn" class="w-full py-3.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-semibold rounded-2xl shadow-lg shadow-zinc-900/10 active:scale-[0.99] transition duration-200 text-xs tracking-wider uppercase mt-4">
+                        Masuk Ke Lemari
+                    </button>
+                </form>
+
+                <div class="text-center text-xs text-zinc-400 dark:text-zinc-500" id="auth-toggle-text">
+                    Belum punya akun? <button type="button" onclick="toggleAuthMode()" class="text-zinc-900 dark:text-zinc-200 font-bold hover:underline focus:outline-none ml-1">Daftar Akun Baru</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app-container" class="hidden flex-col min-h-screen">
+        <!-- HEADER BAR -->
+        <header class="sticky top-0 z-40 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-900/80 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <!-- Sleek minimal brand -->
+                <div class="flex items-center gap-2">
+                    <span class="font-serif-luxury italic text-2xl tracking-tight text-zinc-900 dark:text-white">Fits.ai</span>
+                    <span class="hidden sm:inline-block px-2 py-0.5 text-[8px] tracking-widest font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 uppercase rounded">Intelligent Stylist</span>
+                </div>
+
+                <!-- User panel -->
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
+                        <div class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse"></div>
+                        <span id="nav-user-display" class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Pengguna</span>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="p-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition" title="Ganti Tema">
+                        <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                        <i class="fa-solid fa-sun hidden dark:block text-sm"></i>
+                    </button>
+
+                    <!-- Logout Button -->
+                    <button onclick="logoutUser()" class="p-2.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-xl transition" title="Keluar">
+                        <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTAINER GRID -->
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- SIDEBAR CARD & NAVIGATION -->
+                <div class="lg:col-span-3 space-y-6">
+                    <!-- Profile, Style Setup & Capacity Stats -->
+                    <div class="bg-white dark:bg-cardDark p-6 rounded-[28px] border border-zinc-100 dark:border-zinc-800/80 shadow-sm space-y-6">
+                        <div class="space-y-1">
+                            <p class="text-[9px] uppercase font-bold tracking-widest text-zinc-400">Gaya & Lemari</p>
+                            <h3 id="sidebar-user-welcome" class="font-serif-luxury text-2xl font-bold text-zinc-900 dark:text-white">Halo, Sahabat</h3>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500">Rancang kombinasi busanamu hari ini.</p>
+                        </div>
+
+                        <!-- Style Profile Filter (Hijab / Female / Male) -->
+                        <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Profil Gaya Anda</label>
+                            <select id="user-style-profile" onchange="changeStyleProfile()" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:text-white">
+                                <option value="Hijab">🧕 Hijab / Modest</option>
+                                <option value="Feminin">👗 Feminin (Wanita)</option>
+                                <option value="Maskulin">🤵 Maskulin (Pria)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+                            <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
+                                <span class="block text-[8px] font-bold uppercase tracking-wider text-zinc-400">Isi Lemari</span>
+                                <span id="stat-total-items" class="font-serif-luxury text-2xl font-bold text-zinc-900 dark:text-white mt-1 block">0</span>
+                                <span class="text-[8px] text-zinc-400 block mt-0.5">Tanpa Batas</span>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
+                                <span class="block text-[8px] font-bold uppercase tracking-wider text-zinc-400">Skor Gaya</span>
+                                <span id="stat-avg-score" class="font-serif-luxury text-2xl font-bold text-zinc-900 dark:text-white mt-1 block">-</span>
+                                <span id="stat-avg-label" class="text-[8px] text-zinc-400 block mt-0.5">Belum Ada</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation tabs inside sleek card -->
+                    <nav class="bg-white dark:bg-cardDark p-2.5 rounded-[24px] border border-zinc-100 dark:border-zinc-800/80 shadow-sm space-y-1">
+                        <button onclick="switchTab('wardrobe')" id="tab-wardrobe-btn" class="w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-shirt text-sm"></i>
+                                <span>Lemari Digital</span>
+                            </div>
+                            <span class="text-[10px] bg-white/20 dark:bg-black/10 px-2 py-0.5 rounded-md" id="tab-badge-wardrobe">0</span>
+                        </button>
+
+                        <button onclick="switchTab('matcher')" id="tab-matcher-btn" class="w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                                <span>AI Outfit Matcher</span>
+                            </div>
+                        </button>
+
+                        <button onclick="switchTab('favorites')" id="tab-favorites-btn" class="w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-heart text-sm"></i>
+                                <span>Kombinasi Favorit</span>
+                            </div>
+                            <span class="text-[10px] bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md" id="tab-badge-favorites">0</span>
+                        </button>
+                    </nav>
+                </div>
+
+
+                <!-- RIGHT MAIN CONTENT WORKSPACE -->
+                <div class="lg:col-span-9">
+                    <!-- SECTION 1: DIGITAL WARDROBE TAB -->
+                    <section id="section-wardrobe" class="space-y-6">
+                        <!-- Heading Control Bar -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-cardDark p-6 rounded-[28px] border border-zinc-100 dark:border-zinc-800/80 shadow-sm">
+                            <div class="space-y-1">
+                                <h2 class="font-serif-luxury text-2xl font-bold text-zinc-900 dark:text-white">Lemari Pakaian Digital</h2>
+                                <p class="text-xs text-zinc-400 dark:text-zinc-500">Unggah foto pakaian asli Anda secara instan atau massal tanpa batas.</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button onclick="resetWardrobeData()" class="px-4 py-2.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition border border-zinc-200 dark:border-zinc-800">
+                                    <i class="fa-solid fa-trash-can mr-1.5"></i> Kosongkan
+                                </button>
+                                <button onclick="openUploadModal()" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-900 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-xs rounded-xl shadow-sm hover:scale-[1.01] transition duration-200 flex items-center gap-2">
+                                    <i class="fa-solid fa-plus text-xs"></i> Tambah / Batch Upload
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Wardrobe Filters Area -->
+                        <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar" id="wardrobe-category-filters">
+                            <button onclick="filterWardrobe('Semua')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-zinc-900 text-white dark:bg-white dark:text-zinc-900">Semua</button>
+                            <button onclick="filterWardrobe('Atasan')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900">Atasan</button>
+                            <button onclick="filterWardrobe('Bawahan')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900">Bawahan</button>
+                            <button onclick="filterWardrobe('Outer')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900">Outer</button>
+                            <button onclick="filterWardrobe('Dress')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900">Dress</button>
+                            <button onclick="filterWardrobe('Hijab')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900">Hijab</button>
+                            <button onclick="filterWardrobe('Sepatu')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900">Sepatu</button>
+                            <button onclick="filterWardrobe('Tas')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900">Tas</button>
+                            <button onclick="filterWardrobe('Aksesoris')" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900">Aksesoris</button>
+                        </div>
+
+                        <!-- Wardrobe Empty State -->
+                        <div id="wardrobe-empty-state" class="text-center py-24 bg-white dark:bg-cardDark rounded-[32px] border border-dashed border-zinc-200 dark:border-zinc-800">
+                            <div class="w-16 h-16 bg-zinc-50 dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto text-zinc-400 mb-6">
+                                <i class="fa-solid fa-shirt text-2xl"></i>
+                            </div>
+                            <h3 class="font-serif-luxury text-xl font-bold text-zinc-900 dark:text-white">Lemari Anda Masih Kosong</h3>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 max-w-sm mx-auto mt-2 leading-relaxed">Silakan unggah koleksi pakaian pribadi Anda sekaligus, atau muat koleksi contoh instan yang sesuai profil gaya pilihan Anda.</p>
+                            
+                            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                                <button onclick="loadDemoData()" class="px-6 py-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-100 font-semibold text-xs tracking-wider uppercase rounded-xl transition">
+                                    ✨ Muat Koleksi Contoh (Demo)
+                                </button>
+                                <button onclick="openUploadModal()" class="px-6 py-3 bg-zinc-950 hover:bg-zinc-900 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-xs tracking-wider uppercase rounded-xl shadow-md transition">
+                                    Unggah Pakaian Baru
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Grid clothes list -->
+                        <div id="wardrobe-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 hidden">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </section>
+
+
+                    <!-- SECTION 2: AI OUTIFT MATCHER TAB -->
+                    <section id="section-matcher" class="space-y-6 hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                            <!-- Left Configuration Controller -->
+                            <div class="md:col-span-4 bg-white dark:bg-cardDark p-6 rounded-[28px] border border-zinc-100 dark:border-zinc-800/80 shadow-sm h-fit space-y-6">
+                                <div class="space-y-1">
+                                    <h3 class="font-serif-luxury text-lg font-bold text-zinc-900 dark:text-white">AI Styling Engine</h3>
+                                    <p class="text-xs text-zinc-400">Rancang pakaian otomatis sesuai agenda kegiatan Anda.</p>
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Tujuan Kegiatan</label>
+                                    <select id="match-event" class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 text-xs font-semibold dark:text-white">
+                                        <option value="Kuliah">🎓 Kuliah / Kampus</option>
+                                        <option value="Kerja">💼 Kerja / Kantor</option>
+                                        <option value="Nongkrong">☕ Nongkrong / Santai</option>
+                                        <option value="Traveling">✈️ Traveling / Liburan</option>
+                                        <option value="Seminar">🎤 Seminar / Presentasi</option>
+                                        <option value="Interview">🤝 Interview Pekerjaan</option>
+                                        <option value="Kondangan">🌸 Kondangan / Pesta Pernikahan</option>
+                                        <option value="Acara Formal">🏛️ Acara Resmi / Formal</option>
+                                        <option value="Daily Outfit">🏠 Gaya Sehari-hari</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Gunakan Layer / Outer</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="pref-use-outer" class="sr-only peer" checked>
+                                            <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Gunakan Aksesoris</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="pref-use-acc" class="sr-only peer" checked>
+                                            <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button onclick="generateAIOutfit()" class="w-full py-4 bg-zinc-950 hover:bg-zinc-900 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-xl shadow-lg active:scale-[0.98] transition duration-200 flex items-center justify-center gap-2 group text-xs tracking-wider uppercase">
+                                    <i class="fa-solid fa-wand-magic-sparkles group-hover:rotate-12 transition"></i> Cocokkan Ulang Outfit
+                                </button>
+                            </div>
+
+                            <!-- Right Matches Showcase Layout -->
+                            <div class="md:col-span-8 space-y-6">
+                                <div id="matcher-empty-slate" class="bg-white dark:bg-cardDark p-12 rounded-[32px] border border-zinc-100 dark:border-zinc-800 text-center flex flex-col items-center justify-center min-h-[450px]">
+                                    <div class="w-14 h-14 bg-zinc-50 dark:bg-zinc-900 rounded-full flex items-center justify-center text-zinc-400 mb-4 text-xl">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    </div>
+                                    <h4 class="font-serif-luxury text-lg font-bold text-zinc-900 dark:text-white">Siap Untuk Di Padu Padankan?</h4>
+                                    <p class="text-xs text-zinc-400 dark:text-zinc-500 max-w-sm mt-2 leading-relaxed">Atur kriteria aktivitas dan jalankan pencocokan cerdas untuk melahirkan kombinasi visual busana dari lemari Anda.</p>
+                                    <button onclick="loadDemoData()" id="matcher-empty-demo-btn" class="mt-6 px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl transition hidden">
+                                        ✨ Muat Koleksi Contoh (Demo)
+                                    </button>
+                                </div>
+
+                                <!-- Result Area -->
+                                <div id="matcher-result-container" class="hidden space-y-6">
+                                    <!-- Analysis and Metrics card -->
+                                    <div class="bg-white dark:bg-cardDark p-6 rounded-[28px] border border-zinc-100 dark:border-zinc-800 shadow-sm space-y-6">
+                                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div class="space-y-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span id="result-event-tag" class="px-2.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-md text-[9px] font-bold uppercase tracking-wider">Acara</span>
+                                                    <span id="color-harmony-tag" class="px-2.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-md text-[9px] font-bold uppercase tracking-wider">Harmoni Warna</span>
+                                                </div>
+                                                <h4 class="font-serif-luxury text-xl font-bold text-zinc-900 dark:text-white">Rekomendasi Penampilan AI</h4>
+                                            </div>
+                                            <button onclick="saveCurrentOutfitToFavorites()" class="px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold text-xs rounded-xl transition flex items-center gap-2">
+                                                <i class="fa-regular fa-heart"></i> Simpan Kombinasi
+                                            </button>
+                                        </div>
+
+                                        <!-- Scores progress bar indicator -->
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-zinc-50 dark:border-zinc-800">
+                                            <div class="space-y-1.5">
+                                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Harmoni Warna</span>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                                                        <div id="meter-color" class="bg-zinc-900 dark:bg-white h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                                    </div>
+                                                    <span id="val-color" class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">0%</span>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Kesesuaian Gaya</span>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                                                        <div id="meter-style" class="bg-zinc-900 dark:bg-white h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                                    </div>
+                                                    <span id="val-style" class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">0%</span>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Kesesuaian Acara</span>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                                                        <div id="meter-event" class="bg-zinc-900 dark:bg-white h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                                    </div>
+                                                    <span id="val-event" class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">0%</span>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Kenyamanan</span>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                                                        <div id="meter-comfort" class="bg-zinc-900 dark:bg-white h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                                    </div>
+                                                    <span id="val-comfort" class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Overall Analysis Tag -->
+                                        <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs">
+                                            <span class="text-zinc-400 flex items-center gap-1.5">
+                                                <i class="fa-solid fa-circle-check text-zinc-400"></i> Analisis Cerdas Fits AI
+                                            </span>
+                                            <span id="overall-score-badge" class="font-bold tracking-wider text-zinc-800 dark:text-white">OVERALL MATCH: 0%</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Visual Board (Pinterest Style Grid) -->
+                                    <div class="bg-white/40 dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800 rounded-[32px] p-6 space-y-6">
+                                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest"><i class="fa-solid fa-grid-2 mr-1.5"></i> Visual Outfit Canvas</h5>
+                                        
+                                        <!-- Grid Board Canvas -->
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-6" id="pinterest-board-grid">
+                                            <!-- Injected dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+                    <!-- SECTION 3: FAVORITES TAB -->
+                    <section id="section-favorites" class="space-y-6 hidden">
+                        <!-- Header favorites -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-cardDark p-6 rounded-[28px] border border-zinc-100 dark:border-zinc-800 shadow-sm">
+                            <div class="space-y-1">
+                                <h2 class="font-serif-luxury text-2xl font-bold text-zinc-900 dark:text-white">Kombinasi Outfit Favorit</h2>
+                                <p class="text-xs text-zinc-400 dark:text-zinc-500">Kumpulan perpaduan pakaian yang telah Anda simpan dan sukai.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="fav-event-filter" onchange="filterFavorites()" class="px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 text-xs font-semibold dark:text-white">
+                                    <option value="Semua">Semua Acara</option>
+                                    <option value="Kuliah">Kuliah / Kampus</option>
+                                    <option value="Kerja">Kerja / Kantor</option>
+                                    <option value="Nongkrong">Nongkrong / Santai</option>
+                                    <option value="Traveling">Traveling / Liburan</option>
+                                    <option value="Seminar">Seminar / Presentasi</option>
+                                    <option value="Interview">Interview Pekerjaan</option>
+                                    <option value="Kondangan">Kondangan / Pernikahan</option>
+                                    <option value="Acara Formal">Acara Resmi / Formal</option>
+                                    <option value="Daily Outfit">Gaya Sehari-hari</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Favorites Empty State -->
+                        <div id="favorites-empty-state" class="text-center py-24 bg-white dark:bg-cardDark rounded-[32px] border border-dashed border-zinc-200 dark:border-zinc-800">
+                            <div class="w-16 h-16 bg-zinc-50 dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto text-zinc-400 mb-6">
+                                <i class="fa-solid fa-heart text-2xl"></i>
+                            </div>
+                            <h3 class="font-serif-luxury text-xl font-bold text-zinc-900 dark:text-white">Belum Ada Kombinasi Favorit</h3>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 max-w-sm mx-auto mt-2 leading-relaxed">Simpan pakaian yang dirancang oleh AI Matcher untuk mengumpulkan gaya terbaik Anda di album ini.</p>
+                            <button onclick="switchTab('matcher')" class="mt-6 px-6 py-3 bg-zinc-950 hover:bg-zinc-900 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-xs tracking-wider uppercase rounded-xl shadow-sm transition">
+                                Buka AI Matcher
+                            </button>
+                        </div>
+
+                        <div id="favorites-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <!-- PREMIUM MODAL: DIGITAL WARDROBE ADD / EDIT ITEM & BATCH UPLOAD -->
+    <div id="upload-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeUploadModal()"></div>
+        
+        <!-- Modal Card Content -->
+        <div class="bg-white dark:bg-cardDark rounded-[32px] border border-zinc-100 dark:border-zinc-800 shadow-2xl max-w-2xl w-full overflow-hidden relative z-10 transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]" id="upload-modal-box">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                <h3 class="font-serif-luxury text-lg font-bold text-zinc-900 dark:text-white" id="modal-title">Tambah Pakaian Baru</h3>
+                <button onclick="closeUploadModal()" class="w-8 h-8 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-800 transition flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Modal Scroll Body -->
+            <div class="p-6 overflow-y-auto space-y-5 flex-grow">
+                <!-- Hidden Edit ID -->
+                <input type="hidden" id="edit-item-id" value="">
+
+                <!-- ================= SINGLE ITEM FORM ================= -->
+                <div id="single-item-form" class="space-y-5">
+                    <!-- Visual Capture Area: LIVE CAMERA OR FILE SELECTOR -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Foto Pakaian</label>
+                        <div class="relative w-full aspect-video sm:h-56 bg-zinc-50 dark:bg-zinc-900/60 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden group">
+                            
+                            <!-- Video Direct Stream (For WebRTC supported devices) -->
+                            <video id="camera-video" autoplay playsinline class="hidden w-full h-full object-cover"></video>
+                            
+                            <!-- Picture Captured/Selected Preview -->
+                            <img id="item-image-preview" src="" alt="Pratinjau" class="hidden w-full h-full object-cover">
+                            
+                            <!-- Empty prompt info -->
+                            <div id="image-upload-prompt" class="text-center p-4">
+                                <i class="fa-solid fa-camera text-2xl text-zinc-300 dark:text-zinc-700 group-hover:scale-105 transition duration-300"></i>
+                                <p class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-3">Ambil Foto Langsung atau Unggah</p>
+                                <p class="text-[9px] text-zinc-400 mt-1">Gunakan Kamera HP Anda secara instan atau pilih file lokal.</p>
+                            </div>
+
+                            <!-- Video camera control panel overlay -->
+                            <div class="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-center gap-1.5">
+                                <!-- Secure Direct Native Mobile Camera Bridge -->
+                                <button type="button" onclick="triggerMobileCamera()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[9px] uppercase tracking-wider rounded-lg shadow-md transition flex items-center gap-1 backdrop-blur-md">
+                                    <i class="fa-solid fa-mobile-screen-button text-[10px]"></i> Kamera HP
+                                </button>
+                                
+                                <button type="button" id="start-camera-btn" onclick="startCamera()" class="px-3 py-2 bg-zinc-900/90 hover:bg-zinc-900 text-white font-bold text-[9px] uppercase tracking-wider rounded-lg shadow-md transition flex items-center gap-1 backdrop-blur-md">
+                                    <i class="fa-solid fa-video text-[10px]"></i> Kamera Web
+                                </button>
+                                
+                                <button type="button" id="snap-camera-btn" onclick="takeSnapshot()" class="hidden px-3.5 py-2 bg-zinc-900/90 hover:bg-zinc-900 text-white font-bold text-[9px] uppercase tracking-wider rounded-lg shadow-md transition flex items-center gap-1 backdrop-blur-md">
+                                    <i class="fa-solid fa-circle-dot text-[10px]"></i> Jepret
+                                </button>
+                                
+                                <button type="button" id="stop-camera-btn" onclick="stopCamera()" class="hidden px-3.5 py-2 bg-red-600/95 hover:bg-red-600 text-white font-bold text-[9px] uppercase tracking-wider rounded-lg shadow-md transition flex items-center gap-1 backdrop-blur-md">
+                                    <i class="fa-solid fa-video-slash text-[10px]"></i> Matikan
+                                </button>
+                                
+                                <label class="px-3 py-2 bg-zinc-900/90 hover:bg-zinc-900 text-white font-bold text-[9px] uppercase tracking-wider rounded-lg shadow-md cursor-pointer transition flex items-center gap-1 backdrop-blur-md">
+                                    <i class="fa-solid fa-folder-open text-[10px]"></i> File Lokal
+                                    <input type="file" id="local-file-input" accept="image/*" class="hidden" multiple onchange="handleFileSelection(event)">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fields details -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Nama Pakaian</label>
+                            <input type="text" id="item-name" required class="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 text-xs dark:text-white" placeholder="misal: Kemeja Linen Hitam">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Kategori Pakaian</label>
+                            <select id="item-category" class="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 text-xs font-semibold dark:text-white">
+                                <option value="Atasan">Atasan (Kaos, Kemeja, Blouse, Sweater, Hoodie)</option>
+                                <option value="Bawahan">Bawahan (Celana Panjang, Rok, dll)</option>
+                                <option value="Outer">Outer (Blazer, Cardigan, Jaket, Coat)</option>
+                                <option value="Dress">Dress (Casual, Formal)</option>
+                                <option value="Hijab">Hijab (Pashmina, Segi Empat, dll)</option>
+                                <option value="Sepatu">Sepatu (Sneakers, Flat, Heels, Loafers)</option>
+                                <option value="Tas">Tas (Tote Bag, Sling, Backpack, Hand Bag)</option>
+                                <option value="Aksesoris">Aksesoris (Kacamata, Jam, Kalung)</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Gaya Pakaian (Target)</label>
+                            <select id="item-style-group" class="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 text-xs font-semibold dark:text-white">
+                                <option value="Feminin">👩 Feminin (Wanita)</option>
+                                <option value="Maskulin">👨 Maskulin (Pria)</option>
+                                <option value="Uniseks">👫 Uniseks (Bisa Keduanya)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Color detail picker -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Warna Item</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="item-color" value="#18181B" class="w-10 h-10 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-transparent cursor-pointer">
+                                <input type="text" id="item-color-name" required class="w-full px-4 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 text-[11px] dark:text-white" placeholder="Nama warna (misal: Navy Blue)">
+                            </div>
+                            <!-- Color quick palate options -->
+                            <div class="flex flex-wrap gap-1.5 mt-2">
+                                <button type="button" onclick="quickSelectColor('#F5EBE0', 'Cream')" class="w-4 h-4 rounded-md border border-zinc-200" style="background-color: #F5EBE0;" title="Cream"></button>
+                                <button type="button" onclick="quickSelectColor('#D8E2DC', 'Sage')" class="w-4 h-4 rounded-md border border-zinc-200" style="background-color: #D8E2DC;" title="Sage Green"></button>
+                                <button type="button" onclick="quickSelectColor('#FCD5CE', 'Rose')" class="w-4 h-4 rounded-md border border-zinc-200" style="background-color: #FCD5CE;" title="Dusty Pink"></button>
+                                <button type="button" onclick="quickSelectColor('#B7B7A4', 'Taupe')" class="w-4 h-4 rounded-md border border-zinc-200" style="background-color: #B7B7A4;" title="Taupe"></button>
+                                <button type="button" onclick="quickSelectColor('#DDA15E', 'Latte')" class="w-4 h-4 rounded-md border border-zinc-200" style="background-color: #DDA15E;" title="Latte"></button>
+                                <button type="button" onclick="quickSelectColor('#6E7F80', 'Slate')" class="w-4 h-4 rounded-md border border-zinc-200" style="background-color: #6E7F80;" title="Slate Gray"></button>
+                                <button type="button" onclick="quickSelectColor('#1A1D20', 'Hitam')" class="w-4 h-4 rounded-md border border-zinc-200" style="background-color: #1A1D20;" title="Hitam"></button>
+                            </div>
+                        </div>
+
+                        <!-- Agenda / Suitability checkbox details -->
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Kecocokan Kegiatan</label>
+                            <div class="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 max-h-32 overflow-y-auto space-y-2 text-xs">
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Kuliah" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    🎓 Kuliah / Kampus
+                                </label>
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Kerja" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    💼 Kerja / Kantor
+                                </label>
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Nongkrong" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    ☕ Nongkrong / Santai
+                                </label>
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Traveling" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    ✈️ Traveling / Liburan
+                                </label>
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Seminar" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    🎤 Seminar / Presentasi
+                                </label>
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Interview" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    🤝 Interview Pekerjaan
+                                </label>
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Kondangan" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    🌸 Kondangan / Pernikahan
+                                </label>
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Acara Formal" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    🏛️ Acara Resmi / Formal
+                                </label>
+                                <label class="flex items-center gap-2 font-medium text-zinc-600 dark:text-zinc-400">
+                                    <input type="checkbox" name="item-suitability" value="Daily Outfit" checked class="rounded border-zinc-200 text-zinc-900 focus:ring-zinc-400">
+                                    🏠 Gaya Sehari-hari
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= BATCH (MULTIPLE) UPLOAD STATE ================= -->
+                <div id="batch-upload-form" class="hidden space-y-4">
+                    <div class="p-4 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800">
+                        <h4 class="font-bold text-xs text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-zinc-500"></i> Smart Batch Wizard
+                        </h4>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 leading-relaxed">
+                            Kami secara otomatis mendeteksi perkiraan kategori berdasarkan nama file Anda. Anda dapat menyesuaikan kembali nama, kategori, dan warna untuk masing-masing item secara langsung di bawah ini.
+                        </p>
+                    </div>
+
+                    <!-- Scrollable Grid List for Multi Items -->
+                    <div id="batch-items-list" class="space-y-3 max-h-[42vh] overflow-y-auto pr-1 no-scrollbar">
+                        <!-- Rendered Dynamically via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal footer actions -->
+            <div class="p-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-900/20">
+                <span id="batch-upload-stats" class="hidden text-xs text-zinc-400 font-semibold">0 Item terpilih</span>
+                <div class="flex items-center justify-end gap-3 ml-auto">
+                    <button onclick="closeUploadModal()" class="px-4 py-2 text-xs font-semibold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 rounded-xl transition">Batal</button>
+                    <button id="save-wardrobe-btn" onclick="saveWardrobeItem()" class="px-6 py-2 bg-zinc-950 hover:bg-zinc-900 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold text-xs rounded-xl shadow-sm transition">Simpan Pakaian</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- HIDDEN INPUTS FOR NATIVE / WEBRTC CAMERA FALLBACK -->
+    <!-- This capture="environment" tag bypasses any iframe sandbox restrictions on smartphones directly! -->
+    <input type="file" id="mobile-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleMobileCameraSelection(event)">
+
+
+    <!-- CUSTOM NOTIFICATION TOAST -->
+    <div id="toast-notif" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-zinc-950/90 dark:bg-zinc-900/90 backdrop-blur text-white px-5 py-3.5 rounded-2xl shadow-xl border border-zinc-800 flex items-center gap-3 text-xs font-semibold">
+            <i class="fa-solid fa-circle-check text-white"></i>
+            <span id="toast-msg">Notifikasi sukses!</span>
+        </div>
+    </div>
+
+    <!-- CUSTOM APP DIALOG (Replacing system prompt/alert) -->
+    <div id="custom-dialog" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeCustomDialog(false)"></div>
+        <div class="bg-white dark:bg-zinc-900 rounded-[28px] p-6 max-w-sm w-full border border-zinc-100 dark:border-zinc-800 shadow-2xl relative z-10 transform scale-95 transition-all duration-300" id="dialog-box">
+            <div class="flex items-center gap-3 mb-4 text-zinc-900 dark:text-white" id="dialog-icon-container">
+                <div class="w-9 h-9 rounded-xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-sm">
+                    <i id="dialog-icon" class="fa-solid fa-circle-info"></i>
+                </div>
+                <h4 class="font-serif-luxury text-base font-bold" id="dialog-title">Informasi</h4>
+            </div>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mb-6" id="dialog-message">Pesan disini...</p>
+            <div class="flex justify-end gap-2">
+                <button id="dialog-cancel-btn" onclick="closeCustomDialog(false)" class="px-4 py-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-xl transition">Batal</button>
+                <button id="dialog-confirm-btn" onclick="closeCustomDialog(true)" class="px-4 py-2 text-xs font-semibold text-white bg-zinc-950 dark:bg-white dark:text-zinc-950 rounded-xl transition">Konfirmasi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auxiliary canvas for processing & scaling base64 image down -->
+    <canvas id="capture-canvas" class="hidden" width="240" height="240"></canvas>
+
+
+    <!-- ==================== LOGICAL JAVASCRIPT SYSTEM ==================== -->
+    <script>
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        initTheme();
+        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+        // Custom Dialog controls
+        let dialogResolveCallback = null;
+
+        function showDialog({ title, message, icon = 'fa-circle-info', showCancel = false, confirmText = 'OK', cancelText = 'Batal', type = 'info' }) {
+            return new Promise((resolve) => {
+                const dialog = document.getElementById('custom-dialog');
+                const titleEl = document.getElementById('dialog-title');
+                const msgEl = document.getElementById('dialog-message');
+                const iconEl = document.getElementById('dialog-icon');
+                const cancelBtn = document.getElementById('dialog-cancel-btn');
+                const confirmBtn = document.getElementById('dialog-confirm-btn');
+                const dialogBox = document.getElementById('dialog-box');
+
+                titleEl.innerText = title;
+                msgEl.innerText = message;
+                iconEl.className = `fa-solid ${icon}`;
+                confirmBtn.innerText = confirmText;
+                cancelBtn.innerText = cancelText;
+
+                if (type === 'danger') {
+                    confirmBtn.className = "px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition";
+                } else {
+                    confirmBtn.className = "px-4 py-2 text-xs font-semibold text-white dark:text-zinc-900 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 rounded-xl transition";
+                }
+
+                if (showCancel) {
+                    cancelBtn.classList.remove('hidden');
+                } else {
+                    cancelBtn.classList.add('hidden');
+                }
+
+                dialog.classList.remove('hidden');
+                dialog.classList.add('flex');
+                setTimeout(() => dialogBox.classList.replace('scale-95', 'scale-100'), 50);
+
+                dialogResolveCallback = resolve;
+            });
+        }
+
+        function closeCustomDialog(approved) {
+            const dialog = document.getElementById('custom-dialog');
+            const dialogBox = document.getElementById('dialog-box');
+            dialogBox.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => {
+                dialog.classList.add('hidden');
+                dialog.classList.remove('flex');
+                if (dialogResolveCallback) {
+                    dialogResolveCallback(approved);
+                    dialogResolveCallback = null;
+                }
+            }, 200);
+        }
+
+        // Authentication details
+        let currentUser = null;
+        let authMode = 'login'; 
+
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'register' : 'login';
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleText = document.getElementById('auth-toggle-text');
+
+            if (authMode === 'register') {
+                title.innerText = "Create an account";
+                subtitle.innerText = "Daftarkan akun baru Anda untuk mengatur lemari digital.";
+                submitBtn.innerText = "Daftar Akun Baru";
+                toggleText.innerHTML = `Sudah punya akun? <button type="button" onclick="toggleAuthMode()" class="text-zinc-950 dark:text-zinc-200 font-bold hover:underline focus:outline-none ml-1">Masuk Sekarang</button>`;
+            } else {
+                title.innerText = "Welcome back";
+                subtitle.innerText = "Masuk untuk mengakses lemari pakaian digital Anda.";
+                submitBtn.innerText = "Masuk Ke Lemari";
+                toggleText.innerHTML = `Belum punya akun? <button type="button" onclick="toggleAuthMode()" class="text-zinc-950 dark:text-zinc-200 font-bold hover:underline focus:outline-none ml-1">Daftar Akun Baru</button>`;
+            }
+        }
+
+        async function handleAuthSubmit(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('auth-username').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('auth-password').value;
+
+            if (!usernameInput || !passwordInput) {
+                showDialog({
+                    title: "Informasi Tidak Lengkap",
+                    message: "Silakan isi semua formulir terlebih dahulu.",
+                    icon: "fa-triangle-exclamation"
+                });
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('fitsai_users') || '[]');
+
+            if (authMode === 'login') {
+                const userExists = users.some(u => u.username === usernameInput);
+                
+                if (!userExists) {
+                    const wantToRegister = await showDialog({
+                        title: "Akun Tidak Ditemukan",
+                        message: `Nama pengguna "${usernameInput}" belum terdaftar. Ingin mendaftarkannya langsung ke database?`,
+                        icon: "fa-user-plus",
+                        showCancel: true,
+                        confirmText: "Ya, Daftar",
+                        cancelText: "Batal"
+                    });
+
+                    if (wantToRegister) {
+                        toggleAuthMode();
+                        document.getElementById('auth-username').value = usernameInput;
+                        document.getElementById('auth-password').value = passwordInput;
+                        showToast("Tekan tombol 'Daftar Akun Baru' di bawah.");
+                    }
+                    return;
+                }
+
+                const matchedUser = users.find(u => u.username === usernameInput && u.password === passwordInput);
+                if (matchedUser) {
+                    loginUser(usernameInput);
+                } else {
+                    showDialog({
+                        title: "Masuk Gagal",
+                        message: "Kata sandi yang dimasukkan salah. Silakan coba kembali.",
+                        icon: "fa-circle-xmark",
+                        type: "danger"
+                    });
+                }
+            } else {
+                const userExists = users.some(u => u.username === usernameInput);
+                if (userExists) {
+                    showDialog({
+                        title: "Pendaftaran Gagal",
+                        message: "Nama pengguna sudah dipakai. Gunakan nama pengguna lainnya.",
+                        icon: "fa-circle-exclamation"
+                    });
+                    return;
+                }
+
+                users.push({ username: usernameInput, password: passwordInput, profile: "Neutral" });
+                localStorage.setItem('fitsai_users', JSON.stringify(users));
+                
+                localStorage.setItem(`fitsai_wardrobe_${usernameInput}`, JSON.stringify([]));
+                localStorage.setItem(`fitsai_saved_outfits_${usernameInput}`, JSON.stringify([]));
+
+                showToast("Pendaftaran sukses! Membuka lemari baru...");
+                loginUser(usernameInput);
+            }
+        }
+
+        function loginUser(username) {
+            currentUser = username;
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('app-container').classList.add('flex');
+
+            document.getElementById('nav-user-display').innerText = `@${username}`;
+            document.getElementById('sidebar-user-welcome').innerText = `Halo, ${username.charAt(0).toUpperCase() + username.slice(1)}`;
+
+            // Load user specific profile setting from users list
+            let users = JSON.parse(localStorage.getItem('fitsai_users') || '[]');
+            const userObj = users.find(u => u.username === username);
+            const styleProf = userObj ? (userObj.profile || "Feminin") : "Feminin";
+            document.getElementById('user-style-profile').value = styleProf;
+
+            loadUserData();
+            showToast(`Berhasil masuk! Selamat datang di Fits.ai.`);
+        }
+
+        function changeStyleProfile() {
+            if (!currentUser) return;
+            const styleProf = document.getElementById('user-style-profile').value;
+            
+            // Save profile state to user account database
+            let users = JSON.parse(localStorage.getItem('fitsai_users') || '[]');
+            const idx = users.findIndex(u => u.username === currentUser);
+            if (idx !== -1) {
+                users[idx].profile = styleProf;
+                localStorage.setItem('fitsai_users', JSON.stringify(users));
+            }
+            showToast("Profil gaya berhasil diubah.");
+            renderWardrobeGrid(); // Re-render grid to reflect changes
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('flex');
+            document.getElementById('auth-container').classList.remove('hidden');
+
+            document.getElementById('auth-username').value = '';
+            document.getElementById('auth-password').value = '';
+            authMode = 'login';
+            toggleAuthMode();
+        }
+
+        // Minimalist SVG generator for representative clothes
+        function createSvgPashmina(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><circle cx="50" cy="40" r="18" fill="${bgColor}"/><path d="M50,18 C38,18 32,32 32,45 C32,55 35,68 42,75 C45,78 55,78 58,75 C65,68 68,55 68,45 C68,32 62,18 50,18 Z" fill="${bgColor}" opacity="0.85"/><path d="M35,45 C32,60 38,82 50,85 C62,82 68,60 65,45" fill="none" stroke="${bgColor}" stroke-width="4" stroke-linecap="round"/><path d="M50,58 L50,90" stroke="${bgColor}" stroke-width="8" stroke-linecap="round" opacity="0.75"/></svg>`;
+        }
+
+        function createSvgBlouse(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><path d="M30,30 L70,30 L75,70 L25,70 Z" fill="${bgColor}"/><path d="M30,30 L15,48 L22,54 L30,42 Z" fill="${bgColor}" opacity="0.9"/><path d="M70,30 L85,48 L78,54 L70,42 Z" fill="${bgColor}" opacity="0.9"/><circle cx="50" cy="30" r="10" fill="%23f4f4f5"/></svg>`;
+        }
+
+        function createSvgShirtMale(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><path d="M28,25 L72,25 L72,75 L28,75 Z" fill="${bgColor}"/><path d="M28,25 L15,40 L22,45 L28,38 Z" fill="${bgColor}"/><path d="M72,25 L85,40 L78,45 L72,38 Z" fill="${bgColor}"/><path d="M40,25 L50,38 L60,25" fill="none" stroke="%23ffffff" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="2" fill="%23ffffff"/><circle cx="50" cy="60" r="2" fill="%23ffffff"/></svg>`;
+        }
+
+        function createSvgSkirt(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><path d="M38,25 L62,25 L75,80 L25,80 Z" fill="${bgColor}"/><path d="M38,25 Q50,28 62,25" fill="none" stroke="%23cbd5e1" stroke-width="2"/></svg>`;
+        }
+
+        function createSvgPantsMale(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><path d="M30,22 L70,22 L70,80 L52,80 L50,45 L48,80 L30,80 Z" fill="${bgColor}"/></svg>`;
+        }
+
+        function createSvgShoes(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><path d="M20,65 L35,50 L75,50 C82,50 85,58 85,65 L20,65 Z" fill="${bgColor}"/><path d="M45,50 L52,38 C55,33 65,33 68,38 L72,50" fill="none" stroke="${bgColor}" stroke-width="4" stroke-linecap="round"/></svg>`;
+        }
+
+        function createSvgBag(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><rect x="25" y="38" width="50" height="40" rx="8" fill="${bgColor}"/><path d="M35,38 C35,22 65,22 65,38" fill="none" stroke="${bgColor}" stroke-width="5" stroke-linecap="round"/></svg>`;
+        }
+
+        function createSvgOuter(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><path d="M28,25 L72,25 L78,75 L22,75 Z" fill="${bgColor}"/><path d="M50,25 L35,75 M50,25 L65,75" stroke="%23ffffff" stroke-width="3" opacity="0.5"/><path d="M28,25 L12,45 L18,50 L26,38 Z" fill="${bgColor}" opacity="0.8"/></svg>`;
+        }
+
+        function createSvgDress(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><path d="M35,22 L65,22 L75,85 L25,85 Z" fill="${bgColor}"/><path d="M35,22 L20,40 L28,45 L35,32 L35,22 Z" fill="${bgColor}" opacity="0.9"/><path d="M65,22 L80,40 L72,45 L65,32 L65,22 Z" fill="${bgColor}" opacity="0.9"/><circle cx="50" cy="22" r="8" fill="%23f4f4f5"/></svg>`;
+        }
+
+        function createSvgAccessory(bgColor) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150"><rect width="100%" height="100%" fill="%23f4f4f5"/><circle cx="50" cy="50" r="18" fill="none" stroke="${bgColor}" stroke-width="4"/><path d="M35,38 L65,38" stroke="${bgColor}" stroke-width="6" stroke-linecap="round"/><circle cx="42" cy="38" r="3" fill="%23ffffff"/><circle cx="58" cy="38" r="3" fill="%23ffffff"/></svg>`;
+        }
+
+        // Premium multi-gender demo packages (separated dynamically based on selected profile)
+        const DEMO_ITEMS_POOL = {
+            Hijab: [
+                { id: "h1", name: "Pashmina Cream Silk", category: "Hijab", styleGroup: "Feminin", color: "#F5EBE0", colorName: "Cream", suitability: ["Kuliah", "Kerja", "Nongkrong", "Daily Outfit"], image: createSvgPashmina("%23f5ebe0") },
+                { id: "h2", name: "Square Sage Cotton", category: "Hijab", styleGroup: "Feminin", color: "#D8E2DC", colorName: "Sage Green", suitability: ["Kuliah", "Traveling", "Daily Outfit"], image: createSvgPashmina("%23d8e2dc") },
+                { id: "h3", name: "Pashmina Rosewood Plisket", category: "Hijab", styleGroup: "Feminin", color: "#FCD5CE", colorName: "Dusty Pink", suitability: ["Kondangan", "Traveling"], image: createSvgPashmina("%23fcd5ce") },
+                { id: "h4", name: "Khimar Ebony Premium", category: "Hijab", styleGroup: "Feminin", color: "#1A1D20", colorName: "Ebony", suitability: ["Acara Formal", "Kerja"], image: createSvgPashmina("%231a1d20") },
+                { id: "a1", name: "Blouse Ivory Linen", category: "Atasan", styleGroup: "Feminin", color: "#F5EBE0", colorName: "Ivory", suitability: ["Kuliah", "Kerja", "Seminar"], image: createSvgBlouse("%23f5ebe0") },
+                { id: "a2", name: "Kemeja Sage Satin", category: "Atasan", styleGroup: "Feminin", color: "#D8E2DC", colorName: "Sage Green", suitability: ["Kerja", "Interview", "Acara Formal"], image: createSvgBlouse("%23d8e2dc") },
+                { id: "b1", name: "Rok Plisket Mocca", category: "Bawahan", styleGroup: "Feminin", color: "#DDA15E", colorName: "Mocca", suitability: ["Kuliah", "Daily Outfit", "Nongkrong"], image: createSvgSkirt("%23dda15e") },
+                { id: "b2", name: "Celana Kulot Charcoal", category: "Bawahan", styleGroup: "Feminin", color: "#6E7F80", colorName: "Charcoal", suitability: ["Kerja", "Interview", "Seminar"], image: createSvgSkirt("%236e7f80") },
+                { id: "s1", name: "Flatshoes Ivory Soft", category: "Sepatu", styleGroup: "Feminin", color: "#F5EBE0", colorName: "Cream", suitability: ["Kuliah", "Kerja", "Daily Outfit"], image: createSvgShoes("%23f5ebe0") },
+                { id: "s2", name: "Block Heels Black Noir", category: "Sepatu", styleGroup: "Feminin", color: "#1A1D20", colorName: "Hitam", suitability: ["Kondangan", "Interview", "Acara Formal"], image: createSvgShoes("%231a1d20") },
+                { id: "t1", name: "Slingbag Taupe Minimalist", category: "Tas", styleGroup: "Feminin", color: "#B7B7A4", colorName: "Taupe", suitability: ["Kuliah", "Nongkrong", "Traveling"], image: createSvgBag("%23b7b7a4") },
+                { id: "o1", name: "Blazer Gray Wool", category: "Outer", styleGroup: "Feminin", color: "#6E7F80", colorName: "Gray", suitability: ["Kerja", "Interview", "Seminar"], image: createSvgOuter("%236e7f80") }
+            ],
+            Maskulin: [
+                { id: "m-a1", name: "Kemeja Oxford Latte", category: "Atasan", styleGroup: "Maskulin", color: "#DDA15E", colorName: "Latte", suitability: ["Kerja", "Seminar", "Interview"], image: createSvgShirtMale("%23dda15e") },
+                { id: "m-a2", name: "Kaos Polo Sage Green", category: "Atasan", styleGroup: "Maskulin", color: "#D8E2DC", colorName: "Sage", suitability: ["Nongkrong", "Daily Outfit", "Traveling"], image: createSvgShirtMale("%23d8e2dc") },
+                { id: "m-a3", name: "Kemeja Linen White", category: "Atasan", styleGroup: "Maskulin", color: "#F5EBE0", colorName: "White", suitability: ["Kuliah", "Traveling", "Nongkrong"], image: createSvgShirtMale("%23f5ebe0") },
+                { id: "m-b1", name: "Chinos Pant Charcoal", category: "Bawahan", styleGroup: "Maskulin", color: "#6E7F80", colorName: "Charcoal", suitability: ["Kerja", "Interview", "Seminar", "Kuliah"], image: createSvgPantsMale("%236e7f80") },
+                { id: "m-b2", name: "Ankle Pants Black Noir", category: "Bawahan", styleGroup: "Maskulin", color: "#1A1D20", colorName: "Hitam", suitability: ["Kerja", "Acara Formal", "Interview"], image: createSvgPantsMale("%231a1d20") },
+                { id: "m-s1", name: "Loafers Mocca Suede", category: "Sepatu", styleGroup: "Maskulin", color: "#DDA15E", colorName: "Mocca", suitability: ["Kerja", "Acara Formal", "Nongkrong"], image: createSvgShoes("%23dda15e") },
+                { id: "m-s2", name: "Sneakers Cream Classic", category: "Sepatu", styleGroup: "Uniseks", color: "#F5EBE0", colorName: "Cream", suitability: ["Kuliah", "Traveling", "Daily Outfit"], image: createSvgShoes("%23f5ebe0") },
+                { id: "m-o1", name: "Minimalist Coat Gray", category: "Outer", styleGroup: "Maskulin", color: "#6E7F80", colorName: "Gray", suitability: ["Traveling", "Acara Formal"], image: createSvgOuter("%236e7f80") },
+                { id: "m-t1", name: "Backpack Black Matte", category: "Tas", styleGroup: "Uniseks", color: "#1A1D20", colorName: "Hitam", suitability: ["Kuliah", "Kerja", "Traveling"], image: createSvgBag("%231a1d20") },
+                { id: "m-x1", name: "Analog Watch Gold Frame", category: "Aksesoris", styleGroup: "Uniseks", color: "#DDA15E", colorName: "Gold", suitability: ["Kerja", "Acara Formal"], image: createSvgAccessory("%23dda15e") }
+            ],
+            Feminin: [
+                { id: "f-a1", name: "Blouse Silk Ivory", category: "Atasan", styleGroup: "Feminin", color: "#F5EBE0", colorName: "Ivory", suitability: ["Kerja", "Seminar", "Daily Outfit"], image: createSvgBlouse("%23f5ebe0") },
+                { id: "f-a2", name: "Crop Sweater Rosewood", category: "Atasan", styleGroup: "Feminin", color: "#FCD5CE", colorName: "Rosewood", suitability: ["Nongkrong", "Traveling", "Daily Outfit"], image: createSvgBlouse("%23fcd5ce") },
+                { id: "f-b1", name: "A-Line Skirt Sage Green", category: "Bawahan", styleGroup: "Feminin", color: "#D8E2DC", colorName: "Sage Green", suitability: ["Kuliah", "Nongkrong", "Daily Outfit"], image: createSvgSkirt("%23d8e2dc") },
+                { id: "f-b2", name: "Pleated Skirt Noir Black", category: "Bawahan", styleGroup: "Feminin", color: "#1A1D20", colorName: "Hitam", suitability: ["Kondangan", "Acara Formal", "Kerja"], image: createSvgSkirt("%231a1d20") },
+                { id: "f-d1", name: "Casual Dress Rose Petal", category: "Dress", styleGroup: "Feminin", color: "#FCD5CE", colorName: "Rosewood", suitability: ["Daily Outfit", "Traveling", "Nongkrong"], image: createSvgDress("%23fcd5ce") },
+                { id: "f-s1", name: "Flatshoes Velvet Black", category: "Sepatu", styleGroup: "Feminin", color: "#1A1D20", colorName: "Hitam", suitability: ["Kerja", "Kuliah", "Seminar"], image: createSvgShoes("%231a1d20") },
+                { id: "f-s2", name: "Sling Heels Ivory Classy", category: "Sepatu", styleGroup: "Feminin", color: "#F5EBE0", colorName: "Ivory", suitability: ["Kondangan", "Interview", "Acara Formal"], image: createSvgShoes("%23f5ebe0") },
+                { id: "f-t1", name: "Hand Bag Sage Leather", category: "Tas", styleGroup: "Feminin", color: "#D8E2DC", colorName: "Sage", suitability: ["Kondangan", "Kerja", "Seminar"], image: createSvgBag("%23d8e2dc") },
+                { id: "f-x1", name: "Minimalist Necklace Rose Gold", category: "Aksesoris", styleGroup: "Feminin", color: "#FCD5CE", colorName: "Rosewood", suitability: ["Traveling", "Nongkrong"], image: createSvgAccessory("%23fcd5ce") }
+            ]
+        };
+
+        let wardrobe = [];
+        let savedOutfits = [];
+        let currentGeneratedOutfit = null;
+        let currentFilterCategory = 'Semua';
+        let generatedHistory = []; 
+        let currentBatchItems = []; // Keeps track of multi-uploaded images dynamically in memory
+
+        function loadUserData() {
+            if (!currentUser) return;
+            wardrobe = JSON.parse(localStorage.getItem(`fitsai_wardrobe_${currentUser}`) || '[]');
+            savedOutfits = JSON.parse(localStorage.getItem(`fitsai_saved_outfits_${currentUser}`) || '[]');
+            
+            currentFilterCategory = 'Semua';
+            generatedHistory = [];
+            currentGeneratedOutfit = null;
+            
+            const btns = document.querySelectorAll('.category-filter-btn');
+            btns.forEach((btn, i) => {
+                if (i === 0) {
+                    btn.className = "category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-zinc-900 text-white dark:bg-white dark:text-zinc-900";
+                } else {
+                    btn.className = "category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900";
+                }
+            });
+
+            renderWardrobeGrid();
+            renderFavoritesGrid();
+            updateAppStats();
+            checkMatcherState();
+        }
+
+        function persistData() {
+            if (!currentUser) return;
+            localStorage.setItem(`fitsai_wardrobe_${currentUser}`, JSON.stringify(wardrobe));
+            localStorage.setItem(`fitsai_saved_outfits_${currentUser}`, JSON.stringify(savedOutfits));
+            updateAppStats();
+        }
+
+        function updateAppStats() {
+            document.getElementById('stat-total-items').innerText = wardrobe.length;
+            document.getElementById('tab-badge-wardrobe').innerText = wardrobe.length;
+            document.getElementById('tab-badge-favorites').innerText = savedOutfits.length;
+
+            if (savedOutfits.length === 0) {
+                document.getElementById('stat-avg-score').innerText = '-';
+                document.getElementById('stat-avg-label').innerText = 'Belum Ada';
+            } else {
+                const totalScoreSum = savedOutfits.reduce((sum, o) => sum + (o.scores?.overall || 0), 0);
+                const avg = Math.round(totalScoreSum / savedOutfits.length);
+                document.getElementById('stat-avg-score').innerText = `${avg}%`;
+
+                if (avg >= 90) {
+                    document.getElementById('stat-avg-label').innerText = 'Ultra Modis ✨';
+                } else if (avg >= 75) {
+                    document.getElementById('stat-avg-label').innerText = 'Sangat Serasi';
+                } else {
+                    document.getElementById('stat-avg-label').innerText = 'Kasual Minimalis';
+                }
+            }
+        }
+
+        function loadDemoData() {
+            if (!currentUser) return;
+            const styleProf = document.getElementById('user-style-profile').value;
+            
+            // Fetch relevant gender/style demo group
+            const pool = DEMO_ITEMS_POOL[styleProf] || DEMO_ITEMS_POOL["Neutral"];
+            wardrobe = [...pool];
+            
+            persistData();
+            renderWardrobeGrid();
+            showToast(`Koleksi pakaian demo (${styleProf}) berhasil dimuat!`);
+        }
+
+        async function resetWardrobeData() {
+            const confirmed = await showDialog({
+                title: "Kosongkan Lemari",
+                message: "Apakah Anda yakin ingin menghapus semua isi lemari? Aksi ini tidak dapat dibatalkan.",
+                icon: "fa-triangle-exclamation",
+                showCancel: true,
+                confirmText: "Ya, Hapus Semua",
+                cancelText: "Batal",
+                type: "danger"
+            });
+
+            if (confirmed) {
+                stopCamera();
+                wardrobe = [];
+                persistData();
+                renderWardrobeGrid();
+                showToast("Lemari digital berhasil dikosongkan.");
+            }
+        }
+
+        function checkMatcherState() {
+            const emptySlate = document.getElementById('matcher-empty-slate');
+            const demoBtn = document.getElementById('matcher-empty-demo-btn');
+            
+            if (wardrobe.length === 0) {
+                demoBtn.classList.remove('hidden');
+                emptySlate.querySelector('p').innerText = "Lemari Anda saat ini masih kosong. Harap unggah foto pakaian asli terlebih dahulu atau gunakan koleksi demo kami.";
+            } else {
+                demoBtn.classList.add('hidden');
+                emptySlate.querySelector('p').innerText = "Atur kriteria aktivitas dan jalankan pencocokan cerdas untuk melahirkan kombinasi visual busana dari lemari Anda.";
+            }
+        }
+
+        function renderWardrobeGrid() {
+            const grid = document.getElementById('wardrobe-grid');
+            const emptyState = document.getElementById('wardrobe-empty-state');
+            
+            const filtered = currentFilterCategory === 'Semua' 
+                ? wardrobe 
+                : wardrobe.filter(item => item.category === currentFilterCategory);
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                
+                if (currentFilterCategory !== 'Semua') {
+                    emptyState.querySelector('h3').innerText = `Kategori ${currentFilterCategory} Kosong`;
+                    emptyState.querySelector('p').innerText = `Anda belum memiliki pakaian di kategori ${currentFilterCategory}.`;
+                    document.getElementById('matcher-empty-demo-btn').classList.add('hidden');
+                } else {
+                    emptyState.querySelector('h3').innerText = "Lemari Anda Masih Kosong";
+                    emptyState.querySelector('p').innerText = "Silakan unggah koleksi pakaian pribadi Anda sekaligus, atau muat koleksi contoh instan yang sesuai profil gaya pilihan Anda.";
+                    checkMatcherState();
+                }
+            } else {
+                emptyState.classList.add('hidden');
+                grid.classList.remove('hidden');
+                grid.innerHTML = '';
+
+                filtered.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white dark:bg-cardDark rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm overflow-hidden group hover:shadow-md transition-all duration-300 relative flex flex-col h-full";
+                    card.innerHTML = `
+                        <!-- Picture Thumbnail with compression visual fallback -->
+                        <div class="relative aspect-square w-full bg-zinc-50 dark:bg-zinc-900/40 overflow-hidden flex items-center justify-center border-b border-zinc-100 dark:border-zinc-800">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-102 transition-all duration-300" onerror="this.src='https://placehold.co/300x300/f4f4f5/71717a?text=Fits+AI'">
+                            
+                            <!-- Premium quick action overlay -->
+                            <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <button onclick="editWardrobeItem('${item.id}')" class="w-7 h-7 rounded-lg bg-white/90 dark:bg-zinc-800/90 hover:bg-white dark:hover:bg-zinc-700 shadow-sm flex items-center justify-center text-zinc-600 dark:text-zinc-200 text-xs transition" title="Edit">
+                                    <i class="fa-solid fa-pen text-[10px]"></i>
+                                </button>
+                                <button onclick="deleteWardrobeItem('${item.id}')" class="w-7 h-7 rounded-lg bg-red-600 hover:bg-red-700 shadow-sm flex items-center justify-center text-white text-xs transition" title="Hapus">
+                                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                                </button>
+                            </div>
+
+                            <!-- Muted color chip indicator -->
+                            <div class="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-md flex items-center gap-1.5 text-[9px] font-bold border border-zinc-200/40 dark:border-zinc-800/40">
+                                <div class="w-2.5 h-2.5 rounded-full border border-zinc-200/55" style="background-color: ${item.color}"></div>
+                                <span class="text-zinc-500 dark:text-zinc-400 truncate max-w-[80px]">${item.colorName}</span>
+                            </div>
+                        </div>
+
+                        <!-- Card text description -->
+                        <div class="p-4 flex-grow flex flex-col justify-between space-y-2">
+                            <div class="space-y-1">
+                                <span class="text-[8px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">${item.category}</span>
+                                <h4 class="font-semibold text-xs text-zinc-800 dark:text-zinc-200 leading-snug truncate" title="${item.name}">${item.name}</h4>
+                            </div>
+                            <div class="flex flex-wrap gap-1">
+                                ${item.suitability.slice(0, 2).map(ev => `<span class="text-[8px] font-semibold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">${ev}</span>`).join('')}
+                                ${item.suitability.length > 2 ? `<span class="text-[8px] font-semibold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">+${item.suitability.length - 2}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+            checkMatcherState();
+        }
+
+        function filterWardrobe(category) {
+            currentFilterCategory = category;
+            
+            const btns = document.querySelectorAll('.category-filter-btn');
+            btns.forEach(btn => {
+                if (btn.innerText === category) {
+                    btn.className = "category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-zinc-900 text-white dark:bg-white dark:text-zinc-900";
+                } else {
+                    btn.className = "category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white dark:bg-cardDark text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900";
+                }
+            });
+
+            renderWardrobeGrid();
+        }
+
+        // Tab selection controls
+        function switchTab(tabId) {
+            document.getElementById('section-wardrobe').classList.add('hidden');
+            document.getElementById('section-matcher').classList.add('hidden');
+            document.getElementById('section-favorites').classList.add('hidden');
+
+            const wardrobeBtn = document.getElementById('tab-wardrobe-btn');
+            const matcherBtn = document.getElementById('tab-matcher-btn');
+            const favoritesBtn = document.getElementById('tab-favorites-btn');
+
+            wardrobeBtn.className = "w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900";
+            matcherBtn.className = "w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900";
+            favoritesBtn.className = "w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900";
+
+            document.getElementById('tab-badge-wardrobe').className = "text-[10px] bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md";
+            document.getElementById('tab-badge-favorites').className = "text-[10px] bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md";
+
+            if (tabId === 'wardrobe') {
+                document.getElementById('section-wardrobe').classList.remove('hidden');
+                wardrobeBtn.className = "w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group bg-zinc-950 text-white dark:bg-white dark:text-zinc-950";
+                document.getElementById('tab-badge-wardrobe').className = "text-[10px] bg-white/20 dark:bg-black/10 px-2 py-0.5 rounded-md";
+                renderWardrobeGrid();
+            } else if (tabId === 'matcher') {
+                document.getElementById('section-matcher').classList.remove('hidden');
+                matcherBtn.className = "w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group bg-zinc-950 text-white dark:bg-white dark:text-zinc-950";
+                checkMatcherState();
+            } else if (tabId === 'favorites') {
+                document.getElementById('section-favorites').classList.remove('hidden');
+                favoritesBtn.className = "w-full flex items-center justify-between p-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase transition group bg-zinc-950 text-white dark:bg-white dark:text-zinc-950";
+                document.getElementById('tab-badge-favorites').className = "text-[10px] bg-white/20 dark:bg-black/10 px-2 py-0.5 rounded-md";
+                renderFavoritesGrid();
+            }
+        }
+
+
+        // Wardrobe Add and Modifiers Action
+        function openUploadModal() {
+            document.getElementById('edit-item-id').value = '';
+            document.getElementById('modal-title').innerText = "Tambah Pakaian Baru";
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-category').selectedIndex = 0;
+            document.getElementById('item-color').value = '#18181B';
+            document.getElementById('item-color-name').value = '';
+            
+            const checkboxes = document.getElementsByName('item-suitability');
+            checkboxes.forEach(cb => cb.checked = true);
+
+            document.getElementById('item-image-preview').classList.add('hidden');
+            document.getElementById('image-upload-prompt').classList.remove('hidden');
+
+            // Reset File input value
+            document.getElementById('local-file-input').value = '';
+
+            // Standard layout views toggling
+            document.getElementById('single-item-form').classList.remove('hidden');
+            document.getElementById('batch-upload-form').classList.add('hidden');
+            document.getElementById('batch-upload-stats').classList.add('hidden');
+            document.getElementById('save-wardrobe-btn').innerText = "Simpan Pakaian";
+
+            currentBatchItems = [];
+
+            const modal = document.getElementById('upload-modal');
+            const modalBox = document.getElementById('upload-modal-box');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modalBox.classList.remove('scale-95', 'opacity-0');
+                modalBox.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        function closeUploadModal() {
+            stopCamera();
+            const modal = document.getElementById('upload-modal');
+            const modalBox = document.getElementById('upload-modal-box');
+            
+            modalBox.classList.remove('scale-100', 'opacity-100');
+            modalBox.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
+        }
+
+        function quickSelectColor(hex, name) {
+            document.getElementById('item-color').value = hex;
+            document.getElementById('item-color-name').value = name;
+        }
+
+        // Auto Compress down Image utilizing canvas to maintain small storage footprint (~4-8KB base64 JPEG)
+        function compressAndResizeImage(sourceImgElement, callback) {
+            const canvas = document.getElementById('capture-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set scale size
+            canvas.width = 240;
+            canvas.height = 240;
+            
+            // Center crop square layout mapping
+            const minDim = Math.min(sourceImgElement.naturalWidth || sourceImgElement.videoWidth || sourceImgElement.width, sourceImgElement.naturalHeight || sourceImgElement.videoHeight || sourceImgElement.height);
+            const sx = ((sourceImgElement.naturalWidth || sourceImgElement.videoWidth || sourceImgElement.width) - minDim) / 2;
+            const sy = ((sourceImgElement.naturalHeight || sourceImgElement.videoHeight || sourceImgElement.height) - minDim) / 2;
+
+            ctx.drawImage(sourceImgElement, sx, sy, minDim, minDim, 0, 0, 240, 240);
+            
+            try {
+                // Compress JPEG quality value at 0.55 for lightweight storage
+                const lowResDataUrl = canvas.toDataURL('image/jpeg', 0.55);
+                callback(lowResDataUrl);
+            } catch(e) {
+                console.error("Downscale compression failed, saving raw fallback:", e);
+                callback(sourceImgElement.src);
+            }
+        }
+
+        // Intelligent Category Auto Detector based on filename string keywords
+        function autoDetectCategory(filename) {
+            const name = filename.toLowerCase();
+            if (name.includes("kaos") || name.includes("tshirt") || name.includes("polo") || name.includes("baju")) return "Atasan";
+            if (name.includes("kemeja") || name.includes("shirt") || name.includes("flanel")) return "Atasan";
+            if (name.includes("blouse") || name.includes("blus") || name.includes("tunik")) return "Atasan";
+            if (name.includes("sweater") || name.includes("hoodie") || name.includes("crewneck") || name.includes("sweater")) return "Atasan";
+            
+            if (name.includes("celana") || name.includes("pants") || name.includes("jeans") || name.includes("chinos") || name.includes("cargo") || name.includes("kulot")) return "Bawahan";
+            if (name.includes("rok") || name.includes("skirt") || name.includes("plisket")) return "Bawahan";
+            
+            if (name.includes("outer") || name.includes("blazer") || name.includes("cardigan") || name.includes("jaket") || name.includes("jacket") || name.includes("coat") || name.includes("rompi")) return "Outer";
+            
+            if (name.includes("dress") || name.includes("gamis") || name.includes("maxi") || name.includes("kaftan")) return "Dress";
+            
+            if (name.includes("hijab") || name.includes("pashmina") || name.includes("segiempat") || name.includes("bergo") || name.includes("khimar") || name.includes("kerudung") || name.includes("jilbab")) return "Hijab";
+            
+            if (name.includes("sepatu") || name.includes("shoes") || name.includes("sneakers") || name.includes("heels") || name.includes("loafers") || name.includes("flatshoes") || name.includes("sandal") || name.includes("boots")) return "Sepatu";
+            
+            if (name.includes("tas") || name.includes("bag") || name.includes("sling") || name.includes("backpack") || name.includes("totebag") || name.includes("handbag")) return "Tas";
+            
+            if (name.includes("kacamata") || name.includes("jam") || name.includes("watch") || name.includes("kalung") || name.includes("gelang") || name.includes("cincin") || name.includes("aksesoris")) return "Aksesoris";
+            
+            return "Atasan"; // Default fallback
+        }
+
+        function autoDetectStyleGroup(filename) {
+            const name = filename.toLowerCase();
+            if (name.includes("pria") || name.includes("men") || name.includes("cowok") || name.includes("koko") || name.includes("chinos")) return "Maskulin";
+            if (name.includes("wanita") || name.includes("women") || name.includes("cewek") || name.includes("hijab") || name.includes("skirt") || name.includes("dress") || name.includes("blouse") || name.includes("rok") || name.includes("pashmina")) return "Feminin";
+            
+            // Fallback to active profile selection style group
+            const currentProf = document.getElementById('user-style-profile').value;
+            if (currentProf === 'Maskulin') return 'Maskulin';
+            if (currentProf === 'Hijab' || currentProf === 'Feminin') return 'Feminin';
+            return "Uniseks";
+        }
+
+        // Clean filename for pretty initial user display name
+        function cleanFileNameForTitle(filename) {
+            let name = filename.substring(0, filename.lastIndexOf('.')) || filename;
+            // replace dashes and underscores with spaces
+            name = name.replace(/[-_]/g, ' ');
+            // capitalize words
+            return name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        function handleFileSelection(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            stopCamera();
+
+            // Handle Single File Upload normally
+            if (files.length === 1) {
+                document.getElementById('single-item-form').classList.remove('hidden');
+                document.getElementById('batch-upload-form').classList.add('hidden');
+                document.getElementById('batch-upload-stats').classList.add('hidden');
+                document.getElementById('save-wardrobe-btn').innerText = "Simpan Pakaian";
+
+                const file = files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        compressAndResizeImage(tempImg, function(compressedBase64) {
+                            const preview = document.getElementById('item-image-preview');
+                            preview.src = compressedBase64;
+                            preview.classList.remove('hidden');
+                            document.getElementById('image-upload-prompt').classList.add('hidden');
+                            
+                            // Auto pre-populate title, category, and style group in single upload too for supreme UX
+                            document.getElementById('item-name').value = cleanFileNameForTitle(file.name);
+                            document.getElementById('item-category').value = autoDetectCategory(file.name);
+                            document.getElementById('item-style-group').value = autoDetectStyleGroup(file.name);
+                        });
+                    };
+                    tempImg.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            // ================= MULTI FILE IMPORT (BATCH WIZARD) =================
+            currentBatchItems = [];
+            showToast(`Memproses ${files.length} berkas foto...`);
+            
+            document.getElementById('single-item-form').classList.add('hidden');
+            document.getElementById('batch-upload-form').classList.remove('hidden');
+            document.getElementById('batch-upload-stats').classList.remove('hidden');
+            document.getElementById('batch-upload-stats').innerText = `${files.length} Pakaian Siap Di-Import`;
+            document.getElementById('save-wardrobe-btn').innerText = `Simpan Semua (${files.length})`;
+
+            let filesLoadedCount = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const initialCategory = autoDetectCategory(file.name);
+                const initialTitle = cleanFileNameForTitle(file.name);
+                const initialStyleGroup = autoDetectStyleGroup(file.name);
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        compressAndResizeImage(tempImg, function(compressedBase64) {
+                            currentBatchItems.push({
+                                tempId: 'bulk-' + i + '-' + Date.now(),
+                                name: initialTitle,
+                                category: initialCategory,
+                                styleGroup: initialStyleGroup,
+                                color: '#18181B',
+                                colorName: 'Hitam',
+                                image: compressedBase64
+                            });
+
+                            filesLoadedCount++;
+                            if (filesLoadedCount === files.length) {
+                                renderBatchWizardRows();
+                            }
+                        });
+                    };
+                    tempImg.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderBatchWizardRows() {
+            const listContainer = document.getElementById('batch-items-list');
+            listContainer.innerHTML = '';
+
+            currentBatchItems.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = "p-3 bg-zinc-50 dark:bg-zinc-900/60 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row gap-3 items-center justify-between";
+                row.innerHTML = `
+                    <div class="flex items-center gap-3 w-full sm:w-auto flex-grow">
+                        <div class="w-12 h-12 rounded-xl overflow-hidden bg-zinc-200 flex-shrink-0 border border-zinc-200/50 dark:border-zinc-800">
+                            <img src="${item.image}" alt="" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <input type="text" value="${item.name}" onchange="updateBatchItemName(${index}, this.value)" class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400" placeholder="Nama Pakaian">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                        <!-- Style Group Target Gender -->
+                        <select onchange="updateBatchItemStyleGroup(${index}, this.value)" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 focus:outline-none">
+                            <option value="Feminin" ${item.styleGroup === 'Feminin' ? 'selected' : ''}>👩 Feminin</option>
+                            <option value="Maskulin" ${item.styleGroup === 'Maskulin' ? 'selected' : ''}>👨 Maskulin</option>
+                            <option value="Uniseks" ${item.styleGroup === 'Uniseks' ? 'selected' : ''}>👫 Uniseks</option>
+                        </select>
+
+                        <!-- Category Select -->
+                        <select onchange="updateBatchItemCategory(${index}, this.value)" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 focus:outline-none">
+                            <option value="Atasan" ${item.category === 'Atasan' ? 'selected' : ''}>👕 Atasan</option>
+                            <option value="Bawahan" ${item.category === 'Bawahan' ? 'selected' : ''}>👖 Bawahan</option>
+                            <option value="Outer" ${item.category === 'Outer' ? 'selected' : ''}>🧥 Outer</option>
+                            <option value="Dress" ${item.category === 'Dress' ? 'selected' : ''}>👗 Dress</option>
+                            <option value="Hijab" ${item.category === 'Hijab' ? 'selected' : ''}>🧕 Hijab</option>
+                            <option value="Sepatu" ${item.category === 'Sepatu' ? 'selected' : ''}>👟 Sepatu</option>
+                            <option value="Tas" ${item.category === 'Tas' ? 'selected' : ''}>👜 Tas</option>
+                            <option value="Aksesoris" ${item.category === 'Aksesoris' ? 'selected' : ''}>🕶️ Aksesoris</option>
+                        </select>
+
+                        <!-- Tiny Color Indicator Dropdown/Trigger -->
+                        <div class="flex items-center gap-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-1.5 rounded-lg">
+                            <input type="color" value="${item.color}" onchange="updateBatchItemColor(${index}, this.value)" class="w-5 h-5 bg-transparent border-0 cursor-pointer rounded-md">
+                            <input type="text" value="${item.colorName}" onchange="updateBatchItemColorName(${index}, this.value)" class="w-14 bg-transparent border-0 text-[10px] font-semibold text-zinc-500 focus:outline-none" placeholder="Warna">
+                        </div>
+
+                        <!-- Remove Row -->
+                        <button onclick="removeBatchItem(${index})" class="w-8 h-8 rounded-lg hover:bg-red-50 hover:text-red-600 text-zinc-400 flex items-center justify-center transition" title="Hapus">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function updateBatchItemName(index, val) {
+            if (currentBatchItems[index]) currentBatchItems[index].name = val.trim();
+        }
+
+        function updateBatchItemCategory(index, val) {
+            if (currentBatchItems[index]) currentBatchItems[index].category = val;
+        }
+
+        function updateBatchItemStyleGroup(index, val) {
+            if (currentBatchItems[index]) currentBatchItems[index].styleGroup = val;
+        }
+
+        function updateBatchItemColor(index, val) {
+            if (currentBatchItems[index]) currentBatchItems[index].color = val;
+        }
+
+        function updateBatchItemColorName(index, val) {
+            if (currentBatchItems[index]) currentBatchItems[index].colorName = val.trim();
+        }
+
+        function removeBatchItem(index) {
+            currentBatchItems.splice(index, 1);
+            if (currentBatchItems.length === 0) {
+                closeUploadModal();
+                showToast("Semua antrian bulk-upload dibatalkan.");
+                return;
+            }
+            document.getElementById('batch-upload-stats').innerText = `${currentBatchItems.length} Pakaian Siap Di-Import`;
+            document.getElementById('save-wardrobe-btn').innerText = `Simpan Semua (${currentBatchItems.length})`;
+            renderBatchWizardRows();
+        }
+
+        function saveWardrobeItem() {
+            // Check if we are saving Batch (Multiple) Upload
+            if (currentBatchItems.length > 0) {
+                let savedCount = 0;
+                currentBatchItems.forEach(item => {
+                    if (!item.name) item.name = "Pakaian Tanpa Nama";
+                    
+                    const newItem = {
+                        id: 'item-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                        name: item.name,
+                        category: item.category,
+                        styleGroup: item.styleGroup || "Uniseks",
+                        color: item.color,
+                        colorName: item.colorName || "Hitam",
+                        suitability: ["Kuliah", "Kerja", "Nongkrong", "Traveling", "Seminar", "Interview", "Kondangan", "Acara Formal", "Daily Outfit"], // default matches all
+                        image: item.image,
+                        dateAdded: new Date().toLocaleDateString('id-ID')
+                    };
+                    wardrobe.push(newItem);
+                    savedCount++;
+                });
+
+                showToast(`Berhasil menyimpan ${savedCount} pakaian baru sekaligus!`);
+                persistData();
+                closeUploadModal();
+                renderWardrobeGrid();
+                return;
+            }
+
+            // Otherwise, process Standard Single Item Save
+            const name = document.getElementById('item-name').value.trim();
+            const category = document.getElementById('item-category').value;
+            const styleGroup = document.getElementById('item-style-group').value;
+            const color = document.getElementById('item-color').value;
+            const colorName = document.getElementById('item-color-name').value.trim() || "Warna Unik";
+            const imagePreview = document.getElementById('item-image-preview').src;
+            const editId = document.getElementById('edit-item-id').value;
+
+            if (!name) {
+                showDialog({
+                    title: "Nama Kosong",
+                    message: "Harap isi nama pakaian terlebih dahulu.",
+                    icon: "fa-triangle-exclamation"
+                });
+                return;
+            }
+
+            const selectedSuitabilities = [];
+            const checkboxes = document.getElementsByName('item-suitability');
+            checkboxes.forEach(cb => {
+                if (cb.checked) selectedSuitabilities.push(cb.value);
+            });
+
+            if (selectedSuitabilities.length === 0) {
+                showDialog({
+                    title: "Kegiatan Kosong",
+                    message: "Pilih setidaknya 1 kecocokan aktivitas/kegiatan.",
+                    icon: "fa-triangle-exclamation"
+                });
+                return;
+            }
+
+            // Create beautiful placeholder SVG based on category if user didn't specify/upload any photo
+            let imageToSave = imagePreview;
+            if (!imagePreview || imagePreview.endsWith('index.html') || imagePreview === window.location.href) {
+                const hexVal = color.replace('#', '%23');
+                if (category === 'Atasan') imageToSave = createSvgBlouse(hexVal);
+                else if (category === 'Bawahan') imageToSave = createSvgSkirt(hexVal);
+                else if (category === 'Hijab') imageToSave = createSvgPashmina(hexVal);
+                else if (category === 'Sepatu') imageToSave = createSvgShoes(hexVal);
+                else if (category === 'Tas') imageToSave = createSvgBag(hexVal);
+                else if (category === 'Outer') imageToSave = createSvgOuter(hexVal);
+                else if (category === 'Dress') imageToSave = createSvgDress(hexVal);
+                else imageToSave = createSvgAccessory(hexVal);
+            }
+
+            if (editId) {
+                const idx = wardrobe.findIndex(item => item.id === editId);
+                if (idx !== -1) {
+                    wardrobe[idx] = {
+                        ...wardrobe[idx],
+                        name,
+                        category,
+                        styleGroup,
+                        color,
+                        colorName,
+                        suitability: selectedSuitabilities,
+                        image: imageToSave
+                    };
+                    showToast("Pakaian berhasil diperbarui!");
+                }
+            } else {
+                const newItem = {
+                    id: 'item-' + Date.now(),
+                    name,
+                    category,
+                    styleGroup,
+                    color,
+                    colorName,
+                    suitability: selectedSuitabilities,
+                    image: imageToSave,
+                    dateAdded: new Date().toLocaleDateString('id-ID')
+                };
+                wardrobe.push(newItem);
+                showToast("Pakaian baru berhasil dimasukkan ke lemari!");
+            }
+
+            persistData();
+            closeUploadModal();
+            renderWardrobeGrid();
+        }
+
+        function editWardrobeItem(id) {
+            const item = wardrobe.find(i => i.id === id);
+            if (!item) return;
+
+            openUploadModal();
+            document.getElementById('modal-title').innerText = "Edit Pakaian";
+            document.getElementById('edit-item-id').value = item.id;
+            document.getElementById('item-name').value = item.name;
+            document.getElementById('item-category').value = item.category;
+            document.getElementById('item-style-group').value = item.styleGroup || "Uniseks";
+            document.getElementById('item-color').value = item.color;
+            document.getElementById('item-color-name').value = item.colorName;
+
+            const checkboxes = document.getElementsByName('item-suitability');
+            checkboxes.forEach(cb => {
+                cb.checked = item.suitability.includes(cb.value);
+            });
+
+            const preview = document.getElementById('item-image-preview');
+            preview.src = item.image;
+            preview.classList.remove('hidden');
+            document.getElementById('image-upload-prompt').classList.add('hidden');
+        }
+
+        async function deleteWardrobeItem(id) {
+            const confirmed = await showDialog({
+                title: "Hapus Pakaian",
+                message: "Apakah Anda yakin ingin menghapus pakaian ini dari lemari?",
+                icon: "fa-trash-can",
+                showCancel: true,
+                confirmText: "Hapus",
+                cancelText: "Batal",
+                type: "danger"
+            });
+
+            if (confirmed) {
+                wardrobe = wardrobe.filter(i => i.id !== id);
+                persistData();
+                renderWardrobeGrid();
+                showToast("Pakaian berhasil dihapus.");
+            }
+        }
+
+        // SECURE BULLETPROOF SYSTEM DEVICE CAMERA INTEGRATIONS
+        // Trigger Native Mobile Camera App directly (100% bypasses sandbox blocks in browser iframes)
+        function triggerMobileCamera() {
+            stopCamera(); // Turn off WebRTC if active
+            showToast("Membuka Kamera HP Anda...");
+            document.getElementById('mobile-camera-input').click();
+        }
+
+        // Process picture snapped using native smartphone camera app
+        function handleMobileCameraSelection(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    // Compress and downscale picture smoothly to keep storage clean
+                    compressAndResizeImage(tempImg, function(compressedBase64) {
+                        const preview = document.getElementById('item-image-preview');
+                        preview.src = compressedBase64;
+                        preview.classList.remove('hidden');
+                        document.getElementById('image-upload-prompt').classList.add('hidden');
+                        showToast("Foto berhasil diambil dari Kamera HP!");
+                    });
+                };
+                tempImg.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // LIVE WebRTC Video Camera controls with seamless mobile fallbacks
+        let activeMediaStream = null;
+
+        async function startCamera() {
+            const video = document.getElementById('camera-video');
+            const preview = document.getElementById('item-image-preview');
+            const prompt = document.getElementById('image-upload-prompt');
+            const startBtn = document.getElementById('start-camera-btn');
+            const snapBtn = document.getElementById('snap-camera-btn');
+            const stopBtn = document.getElementById('stop-camera-btn');
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                // Instantly fallback to native mobile system capture without throwing errors!
+                triggerMobileCamera();
+                return;
+            }
+
+            // Mobile compatibility WebRTC parameters
+            const cameraOptions = [
+                { video: { facingMode: { ideal: "environment" }, width: { ideal: 640 }, height: { ideal: 640 } }, audio: false },
+                { video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 640 } }, audio: false },
+                { video: true, audio: false }
+            ];
+
+            let stream = null;
+
+            for (const constraints of cameraOptions) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    if (stream) break; 
+                } catch (err) {
+                    console.warn("Gagal memuat kamera WebRTC dengan opsi:", constraints, err);
+                }
+            }
+
+            if (!stream) {
+                // Silently fallback to native camera to keep UX flowing perfectly!
+                triggerMobileCamera();
+                return;
+            }
+
+            activeMediaStream = stream;
+            video.srcObject = stream;
+            
+            // Critical parameters for Safari iOS compatibility inside mobile browser views
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('autoplay', 'true');
+            video.muted = true;
+            
+            try {
+                await video.play();
+            } catch (e) {
+                console.warn("Autoplay ditunda oleh kebijakan browser:", e);
+            }
+
+            video.classList.remove('hidden');
+            preview.classList.add('hidden');
+            prompt.classList.add('hidden');
+            
+            startBtn.classList.add('hidden');
+            snapBtn.classList.remove('hidden');
+            stopBtn.classList.remove('hidden');
+        }
+
+        function stopCamera() {
+            const video = document.getElementById('camera-video');
+            const startBtn = document.getElementById('start-camera-btn');
+            const snapBtn = document.getElementById('snap-camera-btn');
+            const stopBtn = document.getElementById('stop-camera-btn');
+
+            if (activeMediaStream) {
+                activeMediaStream.getTracks().forEach(track => track.stop());
+                activeMediaStream = null;
+            }
+
+            video.srcObject = null;
+            video.classList.add('hidden');
+            
+            startBtn.classList.remove('hidden');
+            snapBtn.classList.add('hidden');
+            stopBtn.classList.add('hidden');
+        }
+
+        function takeSnapshot() {
+            const video = document.getElementById('camera-video');
+            const preview = document.getElementById('item-image-preview');
+            
+            if (!activeMediaStream) return;
+
+            // Memproses konversi frame video ke bentuk gambar terkompresi lewat canvas
+            compressAndResizeImage(video, function(compressedBase64) {
+                preview.src = compressedBase64;
+                preview.classList.remove('hidden');
+                stopCamera();
+                showToast("Foto pakaian berhasil diambil!");
+            });
+        }
+
+
+        // INTUITIVE AND FLEXIBLE MIX & MATCH RECOMMENDATION ENGINE
+        function generateAIOutfit() {
+            if (wardrobe.length === 0) {
+                showDialog({
+                    title: "Lemari Kosong",
+                    message: "Lemari Anda kosong. Tambahkan pakaian terlebih dahulu atau muat koleksi demo kami.",
+                    icon: "fa-shirt"
+                });
+                switchTab('wardrobe');
+                return;
+            }
+
+            const activeProfile = document.getElementById('user-style-profile').value;
+            
+            const profileFilteredWardrobe = wardrobe.filter(item => {
+                const group = item.styleGroup || 'Uniseks';
+                if (activeProfile === 'Maskulin') {
+                    return group === 'Maskulin' || group === 'Uniseks';
+                } else { // 'Hijab' or 'Feminin' profile targets women style
+                    return group === 'Feminin' || group === 'Uniseks';
+                }
+            });
+
+            const tops = profileFilteredWardrobe.filter(i => i.category === 'Atasan');
+            const bottoms = profileFilteredWardrobe.filter(i => i.category === 'Bawahan');
+            const outers = profileFilteredWardrobe.filter(i => i.category === 'Outer');
+            const dresses = profileFilteredWardrobe.filter(i => i.category === 'Dress');
+            const hijabs = profileFilteredWardrobe.filter(i => i.category === 'Hijab');
+            const shoes = profileFilteredWardrobe.filter(i => i.category === 'Sepatu');
+            const bags = profileFilteredWardrobe.filter(i => i.category === 'Tas');
+            const accessories = profileFilteredWardrobe.filter(i => i.category === 'Aksesoris');
+
+            // Intimate essential core requirements check
+            const hasDressOption = dresses.length > 0;
+            const hasTwoPieceOption = tops.length > 0 && bottoms.length > 0;
+
+            if (!hasDressOption && !hasTwoPieceOption) {
+                showDialog({
+                    title: "Pakaian Inti Kurang",
+                    message: `AI membutuhkan setidaknya (1 Atasan & 1 Bawahan) ATAU 1 Dress yang cocok dengan profil gaya [${activeProfile === 'Maskulin' ? 'Pria' : 'Wanita'}] di lemari Anda untuk merangkai kombinasi.`,
+                    icon: "fa-socks"
+                });
+                return;
+            }
+
+            const chosenEvent = document.getElementById('match-event').value;
+            const useOuterPref = document.getElementById('pref-use-outer').checked;
+            const useAccPref = document.getElementById('pref-use-acc').checked;
+
+            let validOutfits = [];
+
+            // Combinatorics builder - highly flexible (all accessories, bags, hijabs, outers are optional if none exist)
+            // Phase A: Try TwoPiece combinations (Top + Bottom)
+            if (tops.length > 0 && bottoms.length > 0) {
+                tops.forEach(t => {
+                    bottoms.forEach(b => {
+                        // Gather optional components depending on what actually exists in wardrobe
+                        // Hijab is only integrated if active profile is Hijab and hijabs exist
+                        const optionList = {
+                            type: 'TwoPiece',
+                            top: t,
+                            bottom: b,
+                            dress: null,
+                            hijab: (activeProfile === 'Hijab' && hijabs.length > 0) ? hijabs[Math.floor(Math.random() * hijabs.length)] : null,
+                            outer: (useOuterPref && outers.length > 0) ? outers[Math.floor(Math.random() * outers.length)] : null,
+                            shoe: shoes.length > 0 ? shoes[Math.floor(Math.random() * shoes.length)] : null,
+                            bag: bags.length > 0 ? bags[Math.floor(Math.random() * bags.length)] : null,
+                            accessory: (useAccPref && accessories.length > 0) ? accessories[Math.floor(Math.random() * accessories.length)] : null
+                        };
+                        validOutfits.push(optionList);
+                    });
+                });
+            }
+
+            // Phase B: Try Dress combinations
+            if (dresses.length > 0) {
+                dresses.forEach(d => {
+                    const optionList = {
+                        type: 'Dress',
+                        top: null,
+                        bottom: null,
+                        dress: d,
+                        hijab: (activeProfile === 'Hijab' && hijabs.length > 0) ? hijabs[Math.floor(Math.random() * hijabs.length)] : null,
+                        outer: (useOuterPref && outers.length > 0) ? outers[Math.floor(Math.random() * outers.length)] : null,
+                        shoe: shoes.length > 0 ? shoes[Math.floor(Math.random() * shoes.length)] : null,
+                        bag: bags.length > 0 ? bags[Math.floor(Math.random() * bags.length)] : null,
+                        accessory: (useAccPref && accessories.length > 0) ? accessories[Math.floor(Math.random() * accessories.length)] : null
+                    };
+                    validOutfits.push(optionList);
+                });
+            }
+
+            // Rank combinatorics list dynamically by suitability algorithm
+            let relevantOutfits = validOutfits.map(outfit => {
+                let score = 0;
+                let count = 0;
+
+                const activeParts = [outfit.top, outfit.bottom, outfit.dress, outfit.hijab, outfit.outer, outfit.shoe, outfit.bag, outfit.accessory].filter(p => p !== null);
+
+                activeParts.forEach(item => {
+                    if (item.suitability.includes(chosenEvent)) {
+                        score += 100;
+                    } else {
+                        score += 50; 
+                    }
+                    count++;
+                });
+
+                const finalSuitability = Math.round(score / count);
+                return { outfit, suitabilityScore: finalSuitability };
+            });
+
+            // Sort by match quality descending
+            relevantOutfits.sort((a, b) => b.suitabilityScore - a.suitabilityScore);
+
+            // ANTI-REPEAT ALGORITHM (Tracks hashes)
+            let chosenCandidate = null;
+            let finalSelection = null;
+
+            for (let i = 0; i < relevantOutfits.length; i++) {
+                const cand = relevantOutfits[i].outfit;
+                const fingerprint = [
+                    cand.top?.id || '',
+                    cand.bottom?.id || '',
+                    cand.dress?.id || '',
+                    cand.hijab?.id || '',
+                    cand.outer?.id || '',
+                    cand.shoe?.id || '',
+                    cand.bag?.id || ''
+                ].join(':');
+
+                if (!generatedHistory.includes(fingerprint)) {
+                    chosenCandidate = cand;
+                    finalSelection = relevantOutfits[i];
+                    generatedHistory.push(fingerprint);
+                    break;
+                }
+            }
+
+            // Fallback: If we exhausted all unique combinations, reset track log
+            if (!chosenCandidate && relevantOutfits.length > 0) {
+                generatedHistory = [];
+                finalSelection = relevantOutfits[0];
+                chosenCandidate = finalSelection.outfit;
+                const fingerprint = [
+                    chosenCandidate.top?.id || '',
+                    chosenCandidate.bottom?.id || '',
+                    chosenCandidate.dress?.id || '',
+                    chosenCandidate.hijab?.id || '',
+                    chosenCandidate.outer?.id || '',
+                    chosenCandidate.shoe?.id || '',
+                    chosenCandidate.bag?.id || ''
+                ].join(':');
+                generatedHistory.push(fingerprint);
+            }
+
+            if (!finalSelection) {
+                showDialog({
+                    title: "Pencocokan Gagal",
+                    message: "Gagal merumuskan kombinasi yang serasi. Coba tambahkan variasi pakaian ke lemari Anda.",
+                    icon: "fa-circle-exclamation"
+                });
+                return;
+            }
+
+            calculateAndDisplayOutfit(finalSelection, chosenEvent);
+        }
+
+        // HARMONY CALCULATION & PREMIUM FASHION DISPLAY
+        function calculateAndDisplayOutfit(selection, chosenEvent) {
+            const outfit = selection.outfit;
+            
+            // Color Harmony calculation metrics
+            let colorScore = 88;
+            let harmonyLabel = "Contemporary Balanced Neutral";
+
+            // If we have at least Top and Bottom or Dress, check contrast
+            const primaryPiece = outfit.top || outfit.dress;
+            const secondaryPiece = outfit.bottom || outfit.hijab || outfit.outer;
+
+            if (primaryPiece && secondaryPiece) {
+                const rgb1 = hexToRgb(primaryPiece.color);
+                const rgb2 = hexToRgb(secondaryPiece.color);
+                const contrast = calculateColorContrast(rgb1, rgb2);
+
+                if (contrast < 45) {
+                    colorScore = 96;
+                    harmonyLabel = "Monochromatic Luxury";
+                } else if (contrast < 110) {
+                    colorScore = 92;
+                    harmonyLabel = "Harmonis / Analogous Style";
+                } else {
+                    colorScore = 86;
+                    harmonyLabel = "Complementary Accent Contrast";
+                }
+            }
+
+            const suitabilityScore = selection.suitabilityScore;
+            const styleScore = outfit.outer ? 95 : 88; // Layered clothing scores higher in design
+            const comfortScore = (outfit.shoe?.name.toLowerCase().includes('snicker') || outfit.shoe?.name.toLowerCase().includes('flat') || outfit.shoe?.name.toLowerCase().includes('sneaker')) ? 96 : 85;
+
+            const overallScore = Math.round((colorScore + styleScore + suitabilityScore + comfortScore) / 4);
+
+            currentGeneratedOutfit = {
+                id: 'outfit-' + Date.now(),
+                event: chosenEvent,
+                colorHarmony: harmonyLabel,
+                items: {
+                    top: outfit.top,
+                    bottom: outfit.bottom,
+                    dress: outfit.dress,
+                    hijab: outfit.hijab,
+                    outer: outfit.outer,
+                    shoe: outfit.shoe,
+                    bag: outfit.bag,
+                    accessory: outfit.accessory
+                },
+                scores: {
+                    color: colorScore,
+                    style: styleScore,
+                    suitability: suitabilityScore,
+                    comfort: comfortScore,
+                    overall: overallScore
+                },
+                rating: 0
+            };
+
+            // Smooth UI adjustments
+            document.getElementById('result-event-tag').innerText = `Acara: ${chosenEvent}`;
+            document.getElementById('color-harmony-tag').innerText = harmonyLabel;
+
+            document.getElementById('meter-color').style.width = `${colorScore}%`;
+            document.getElementById('val-color').innerText = `${colorScore}%`;
+
+            document.getElementById('meter-style').style.width = `${styleScore}%`;
+            document.getElementById('val-style').innerText = `${styleScore}%`;
+
+            document.getElementById('meter-event').style.width = `${suitabilityScore}%`;
+            document.getElementById('val-event').innerText = `${suitabilityScore}%`;
+
+            document.getElementById('meter-comfort').style.width = `${comfortScore}%`;
+            document.getElementById('val-comfort').innerText = `${comfortScore}%`;
+
+            document.getElementById('overall-score-badge').innerText = `OVERALL MATCH: ${overallScore}%`;
+
+            // Display Visual board
+            renderPinterestVisualCanvas(currentGeneratedOutfit.items);
+
+            document.getElementById('matcher-empty-slate').classList.add('hidden');
+            const resultBox = document.getElementById('matcher-result-container');
+            resultBox.classList.remove('hidden');
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderPinterestVisualCanvas(items) {
+            const container = document.getElementById('pinterest-board-grid');
+            container.innerHTML = '';
+
+            // Layout display queue: Hijab -> Outer -> Top -> Bottom -> Dress -> Sepatu -> Tas -> Aksesoris
+            const renderQueue = [];
+
+            if (items.hijab) renderQueue.push({ role: 'Hijab / Headwear', item: items.hijab });
+            if (items.outer) renderQueue.push({ role: 'Outer Layer', item: items.outer });
+            if (items.top) renderQueue.push({ role: 'Atasan Pakaian', item: items.top });
+            if (items.bottom) renderQueue.push({ role: 'Bawahan Pakaian', item: items.bottom });
+            if (items.dress) renderQueue.push({ role: 'Dress Utuh', item: items.dress });
+            if (items.shoe) renderQueue.push({ role: 'Alas Kaki', item: items.shoe });
+            if (items.bag) renderQueue.push({ role: 'Tas Utama', item: items.bag });
+            if (items.accessory) renderQueue.push({ role: 'Aksesoris', item: items.accessory });
+
+            renderQueue.forEach(q => {
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-cardDark rounded-2xl border border-zinc-100 dark:border-zinc-800 p-3 shadow-sm hover:translate-y-[-1px] transition duration-200";
+                card.innerHTML = `
+                    <span class="block text-[8px] font-extrabold uppercase text-zinc-400 tracking-wider mb-2">${q.role}</span>
+                    <div class="aspect-square bg-zinc-50 dark:bg-zinc-900 rounded-xl overflow-hidden mb-3 border border-zinc-100 dark:border-zinc-800/80">
+                        <img src="${q.item.image}" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate" title="${q.item.name}">${q.item.name}</p>
+                    <div class="flex items-center gap-1.5 mt-1">
+                        <div class="w-2.5 h-2.5 rounded-full border border-zinc-200" style="background-color: ${q.item.color}"></div>
+                        <span class="text-[9px] text-zinc-400 font-medium truncate">${q.item.colorName}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Auxiliary color contrast calculator
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 50, g: 50, b: 50 };
+        }
+
+        function calculateColorContrast(r1, r2) {
+            return Math.sqrt(
+                Math.pow(r1.r - r2.r, 2) +
+                Math.pow(r1.g - r2.g, 2) +
+                Math.pow(r1.b - r2.b, 2)
+            );
+        }
+
+        // Saved combinations album controls
+        function saveCurrentOutfitToFavorites() {
+            if (!currentGeneratedOutfit) return;
+
+            const exists = savedOutfits.some(o => o.id === currentGeneratedOutfit.id);
+            if (exists) {
+                showToast("Kombinasi ini sudah disimpan!");
+                return;
+            }
+
+            savedOutfits.push(currentGeneratedOutfit);
+            persistData();
+            renderFavoritesGrid();
+            showToast("Kombinasi busana disimpan ke favorit!");
+        }
+
+        async function removeOutfitFromFavorites(id) {
+            const confirmed = await showDialog({
+                title: "Hapus Kombinasi",
+                message: "Apakah Anda yakin ingin menghapus kombinasi outfit ini dari favorit?",
+                icon: "fa-heart-crack",
+                showCancel: true,
+                confirmText: "Hapus",
+                cancelText: "Batal",
+                type: "danger"
+            });
+
+            if (confirmed) {
+                savedOutfits = savedOutfits.filter(o => o.id !== id);
+                persistData();
+                renderFavoritesGrid();
+                showToast("Berhasil dihapus.");
+            }
+        }
+
+        function rateOutfit(id, score) {
+            const idx = savedOutfits.findIndex(o => o.id === id);
+            if (idx === -1) return;
+
+            savedOutfits[idx].rating = score;
+            persistData();
+            renderFavoritesGrid();
+            showToast(`Rating bintang ${score} disimpan!`);
+        }
+
+        function filterFavorites() {
+            renderFavoritesGrid();
+        }
+
+        function renderFavoritesGrid() {
+            const grid = document.getElementById('favorites-grid');
+            const emptyState = document.getElementById('favorites-empty-state');
+            const chosenEvent = document.getElementById('fav-event-filter').value;
+
+            const filtered = chosenEvent === 'Semua' 
+                ? savedOutfits 
+                : savedOutfits.filter(o => o.event === chosenEvent);
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                if (chosenEvent !== 'Semua') {
+                    emptyState.querySelector('h3').innerText = `Favorit ${chosenEvent} Kosong`;
+                    emptyState.querySelector('p').innerText = `Belum ada kombinasi untuk aktivitas ${chosenEvent} yang Anda sukai.`;
+                } else {
+                    emptyState.querySelector('h3').innerText = "Belum Ada Kombinasi Favorit";
+                    emptyState.querySelector('p').innerText = "Simpan pakaian yang dirancang oleh AI Matcher untuk mengumpulkan gaya terbaik Anda di album ini.";
+                }
+            } else {
+                emptyState.classList.add('hidden');
+                grid.classList.remove('hidden');
+                grid.innerHTML = '';
+
+                filtered.forEach(o => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white dark:bg-cardDark rounded-3xl border border-zinc-100 dark:border-zinc-800 p-6 shadow-sm flex flex-col justify-between space-y-4";
+                    
+                    const itemPicsHtml = [];
+                    const activeItems = [o.items.top, o.items.bottom, o.items.dress, o.items.hijab, o.items.outer, o.items.shoe, o.items.bag].filter(p => p !== null && p !== undefined);
+                    
+                    activeItems.forEach(item => {
+                        itemPicsHtml.push(`
+                            <div class="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900 overflow-hidden border border-zinc-100 dark:border-zinc-800 flex-shrink-0" title="${item.name}">
+                                <img src="${item.image}" alt="" class="w-full h-full object-cover">
+                            </div>
+                        `);
+                    });
+
+                    let starsHtml = '';
+                    for (let val = 1; val <= 5; val++) {
+                        if (val <= o.rating) {
+                            starsHtml += `<button onclick="rateOutfit('${o.id}', ${val})" class="text-zinc-900 dark:text-zinc-200 hover:scale-110 transition"><i class="fa-solid fa-star text-xs"></i></button>`;
+                        } else {
+                            starsHtml += `<button onclick="rateOutfit('${o.id}', ${val})" class="text-zinc-200 dark:text-zinc-800 hover:scale-110 transition"><i class="fa-solid fa-star text-xs"></i></button>`;
+                        }
+                    }
+
+                    card.innerHTML = `
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-md text-[9px] font-bold uppercase tracking-wider">${o.event}</span>
+                                <button onclick="removeOutfitFromFavorites('${o.id}')" class="text-zinc-300 hover:text-red-500 text-xs transition" title="Hapus Favorit">
+                                    <i class="fa-solid fa-heart-crack"></i>
+                                </button>
+                            </div>
+
+                            <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider"><i class="fa-solid fa-circle-check text-zinc-400 mr-1"></i> Match Score: ${o.scores.overall}% (${o.colorHarmony})</p>
+                            
+                            <div class="flex items-center gap-1.5 overflow-x-auto py-2 no-scrollbar border-y border-zinc-50 dark:border-zinc-800/80 my-1">
+                                ${itemPicsHtml.join('')}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[10px]">
+                            <span class="font-bold text-zinc-400 uppercase tracking-widest">Penilaian Anda:</span>
+                            <div class="flex items-center gap-1">
+                                ${starsHtml}
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // Custom Premium Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast-notif');
+            document.getElementById('toast-msg').innerText = message;
+            
+            toast.classList.replace('translate-y-24', 'translate-y-0');
+            toast.classList.replace('opacity-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.replace('translate-y-0', 'translate-y-24');
+                toast.classList.replace('opacity-100', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
